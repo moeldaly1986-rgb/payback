@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Payback</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#eef1f7;--card:#fff;--ink:#1f2a44;--mute:#5d6882;--navy:#1f2a44;--onnavy:#fff;
+  --gold:#b8924a;--gold2:#e8c77a;--field:#fff6dc;--line:#d9dfec;--pale:#e9edf5;
+  --good:#1e6b45;--bad:#b3261e;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1524;--card:#192137;--ink:#e7ebf5;--mute:#9aa6c2;--navy:#0b1020;--onnavy:#e7ebf5;
+    --gold:#e8c77a;--gold2:#e8c77a;--field:#2a2718;--line:#2b3654;--pale:#222c47;
+    --good:#6fd39e;--bad:#ff8a80;color-scheme:dark
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1524;--card:#192137;--ink:#e7ebf5;--mute:#9aa6c2;--navy:#0b1020;--onnavy:#e7ebf5;
+  --gold:#e8c77a;--gold2:#e8c77a;--field:#2a2718;--line:#2b3654;--pale:#222c47;
+  --good:#6fd39e;--bad:#ff8a80;color-scheme:dark
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,Tahoma,"Segoe UI",system-ui,sans-serif;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--navy);z-index:10}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--navy);color:var(--onnavy);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:10px 16px}
+.bar h1{font-size:15px;margin:0;font-weight:700}
+.bar small{display:block;font-size:11px;opacity:.75;font-weight:400}
+.bar-actions{display:flex;align-items:center;gap:12px}
+.theme-btn{padding:6px 10px;border-radius:8px;border:1px solid rgba(232,199,122,.45);background:rgba(255,255,255,.06);color:var(--gold2);font-size:12px;cursor:pointer}
+.roi{text-align:left}
+.roi b{font-size:30px;line-height:1;color:var(--gold2);font-weight:700;font-variant-numeric:tabular-nums}
+.roi span{display:block;font-size:11px;opacity:.75}
+main{max-width:920px;margin:0 auto;padding:14px 12px 44px;display:grid;gap:14px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+section>h2{margin:0;padding:9px 14px;font-size:14px;background:var(--navy);color:var(--onnavy);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+section>h2 small{opacity:.75;font-weight:400;margin-inline-start:8px;font-size:11px}
+.mode-switch{display:inline-flex;background:rgba(255,255,255,.1);padding:3px;border-radius:9px;border:1px solid rgba(232,199,122,.35)}
+.mode-btn{padding:4px 11px;border-radius:7px;border:none;background:transparent;color:var(--onnavy);font:700 11.5px Cairo,Tahoma,sans-serif;cursor:pointer;transition:.2s}
+.mode-btn.active{background:var(--gold);color:#1f2a44}
+.toggle-pill{padding:4px 11px;border-radius:8px;border:1px solid rgba(232,199,122,.5);background:rgba(255,255,255,.08);color:var(--gold2);font:600 11.5px Cairo,Tahoma,sans-serif;cursor:pointer;transition:.2s}
+.toggle-pill.on{background:var(--gold);color:#1f2a44;border-color:var(--gold)}
+
+/* Uniform Grid Layout */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px;align-items:stretch}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;grid-column:1/-1;align-items:stretch}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;grid-column:1/-1;align-items:stretch}
+.grid-full{grid-column:1/-1}
+
+label{display:flex;flex-direction:column;justify-content:space-between;font-size:12px;font-weight:600;color:var(--mute);background:rgba(31,42,68,.02);border:1px solid var(--line);border-radius:10px;padding:8px 9px}
+label .lbl-txt{display:block;line-height:1.35}
+label small{font-weight:400;display:block;font-size:10.5px;margin-top:1px}
+input{width:100%;margin-top:6px;padding:8px 6px;border:1.5px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);font:700 15px Cairo,Tahoma,sans-serif;text-align:center;direction:ltr}
+input[data-txt="1"]{font-weight:600;font-size:14px}
+input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+
+.yrs-meta{display:flex;justify-content:space-between;align-items:center;gap:4px;margin-top:6px;padding:4px 6px;border-radius:7px;background:var(--pale);font-size:11px;font-weight:700;color:var(--ink)}
+.yrs-meta-top{margin-top:6px;margin-bottom:6px;padding:6px 8px;font-size:12.5px}
+.yrs-meta-top b{font-size:14.5px}
+.yrs-meta span{display:inline-flex;align-items:center;gap:3px}
+.yrs-meta b{color:var(--gold);font-size:12.5px}
+
+.sub-box{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:11px;border:1.5px dashed var(--gold);border-radius:11px;background:rgba(184,146,74,.05);align-items:stretch}
+.sub-box-2{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:11px;border:1.5px dashed var(--gold);border-radius:11px;background:rgba(184,146,74,.05);align-items:stretch}
+.sub-box-title{grid-column:1/-1;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:-2px}
+
+.total-row{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:rgba(31,42,68,.03);align-items:stretch}
+.garage-row{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:2px 0 8px;border-bottom:1px dashed var(--line)}
+.disc-row{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:stretch}
+.disc-row>*{min-width:0;height:100%;margin:0}
+.disc-row label,.disc-row .out{height:100%}
+.total-pair{grid-column:1/-1;display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:8px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.total-pair .sw{display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--gold)}
+.total-pair p{grid-column:1/-1;margin:0;font-size:11px;color:var(--mute);text-align:center}
+
+.out{background:var(--pale);border-radius:10px;padding:9px 8px;text-align:center;display:flex;flex-direction:column;justify-content:space-between;border:1px solid transparent}
+.out span{display:block;font-size:11.5px;color:var(--mute);font-weight:600;line-height:1.35}
+.out span small{display:block;font-size:10px;font-weight:400;opacity:.85;margin-top:1px}
+.out b{font-size:16.5px;font-variant-numeric:tabular-nums;margin-top:6px;display:block}
+.out.big{background:var(--navy);color:var(--onnavy)}
+.out.big span{color:var(--gold2)}
+.out.big b{font-size:19px}
+
+.pos{color:var(--good)}.neg{color:var(--bad)}
+.status-banner{grid-column:1/-1;background:rgba(30,107,69,.12);border:1.5px solid var(--good);color:var(--good);border-radius:10px;padding:9px 10px;text-align:center;font-weight:700;font-size:12px}
+
+.ann-list{grid-column:1/-1;display:grid;gap:8px}
+.ann-item{display:grid;grid-template-columns:110px 1fr auto;gap:8px;align-items:stretch;background:var(--card);border:1px solid var(--line);padding:9px;border-radius:10px}
+.ann-dual{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:stretch}
+.ann-dual .sw{display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gold)}
+.del-btn{padding:8px 11px;border-radius:8px;border:1px solid var(--bad);color:var(--bad);background:transparent;font:700 12px Cairo,sans-serif;cursor:pointer;align-self:center}
+.add-ann-btn{justify-self:start;padding:7px 13px;border-radius:8px;border:1.5px dashed var(--gold);background:rgba(184,146,74,.1);color:var(--ink);font:700 12px Cairo,sans-serif;cursor:pointer}
+
+.inst-display-bar{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 11px;background:var(--pale);border-radius:10px;border:1px solid var(--line)}
+.inst-display-bar span{font-size:12px;font-weight:700;color:var(--ink)}
+.paired-col{display:flex;flex-direction:column;gap:7px;min-width:0}
+.disp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.disp-grid .mode-btn{width:100%;padding:6px 2px;font-size:10.5px;border-radius:8px}
+#dispAll{border:1.5px solid var(--gold)!important;background:rgba(184,146,74,.18)!important}
+#dispAll.active{background:var(--gold)!important;color:#1f2a44!important}
+.inst-values-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.inst-values-grid{grid-template-columns:repeat(4,1fr)!important;align-items:stretch}
+.inst-values-grid .out{padding:4px 5px;height:34px!important;min-height:34px!important;max-height:34px!important;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;overflow:hidden;white-space:nowrap}
+.inst-values-grid .out b{white-space:nowrap}
+.counts-grid .count-box{height:32px!important;min-height:32px!important;max-height:32px!important;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
+.disp-grid .mode-btn{height:34px!important;min-height:34px!important;max-height:34px!important;box-sizing:border-box;white-space:nowrap;overflow:hidden}
+.disp-grid .mode-btn.active{border-width:1.5px!important;padding:6px 2px!important}
+.inst-values-grid .out.is-hidden{visibility:hidden}
+.inst-values-grid .out span{font-size:10px}
+
+#w_qm{grid-column:1}
+#w_qq{grid-column:2}
+#w_qy{grid-column:3}
+.disp-compact{flex-direction:column;align-items:stretch;padding:6px 7px;gap:5px}
+.inst-stack{display:flex;flex-direction:column;gap:6px}
+.inst-values-grid .out{padding:6px 5px}
+.inst-values-grid .out span{font-size:10px}
+
+.counts-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.count-box{background:var(--pale);border:1.5px solid var(--gold);border-radius:8px;padding:6px 4px;text-align:center;font-size:11.5px;font-weight:700;color:var(--ink)}
+.count-box b{font-size:13px}
+.count-box.empty{border-style:dashed;opacity:.35}
+.inst-values-grid .out.is-hidden{visibility:hidden}
+.disp-compact span{font-size:11px}
+
+.wrap{overflow-x:auto;padding:0 8px 12px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:580px}
+th{background:var(--pale);padding:7px 6px;font-weight:700;white-space:nowrap}
+th small{display:block;font-size:10px;font-weight:400;color:var(--mute)}
+td{padding:7px 6px;text-align:center;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+td:first-child{font-weight:600}
+.dim{color:var(--mute)}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+button{font:600 13px Cairo,Tahoma,sans-serif;padding:9px 16px;border-radius:9px;border:1.5px solid var(--gold);background:transparent;color:var(--ink);cursor:pointer}
+button.primary{background:var(--navy);color:var(--onnavy);border-color:var(--navy)}
+button.danger{border-color:var(--bad);color:var(--bad)}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.hint-bar{font-size:11.5px;color:var(--mute);text-align:center;margin-top:-6px}
+.dev-badge{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin:6px auto 0;padding:4px 16px;border-radius:999px;border:1.5px solid rgba(232,199,122,.65);background:rgba(232,199,122,.16);color:var(--gold2);font-size:12.5px;font-weight:700;letter-spacing:.5px;direction:ltr}
+.pb{display:none}
+.page-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:var(--card);padding:8px;border-radius:14px;border:1px solid var(--line)}
+.page-tab{padding:10px 12px;border-radius:10px;border:1.5px solid transparent;background:var(--pale);color:var(--ink);font:700 13px Cairo,Tahoma,sans-serif;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.page-tab small{font-size:10.5px;font-weight:400;opacity:.8}
+.page-tab.active{background:var(--navy);color:var(--gold2);border-color:var(--gold)}
+.page-pane{display:grid;gap:14px}
+
+.hidden{display:none!important}
+
+@media print{
+  :root:root:root{--bg:#fff;--card:#fff;--ink:#1f2a44;--mute:#5d6882;--navy:#1f2a44;--onnavy:#fff;--gold:#b8924a;--gold2:#e8c77a;--field:#fff6dc;--line:#d9dfec;--pale:#e9edf5;--good:#1e6b45;--bad:#b3261e;padding:0;color-scheme:light}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff}body::before{display:none}
+  .bar{position:static}main{display:block;max-width:none;padding:8px 0}section{display:block;margin-bottom:10px;overflow:visible}
+  section{break-inside:avoid}
+  #schedSec{break-inside:auto;page-break-inside:auto;margin-top:0}
+  tr{break-inside:avoid}
+  .wrap{overflow:visible}table{min-width:0!important}
+  td,th{padding:4px 6px;font-size:11.5px}
+  .actions,.hint-bar,.theme-btn,.mode-switch,.toggle-pill,.del-btn,.add-ann-btn,.inst-display-bar,.page-tabs,.pb,.dev-badge{display:none!important}
+  .page-pane.hidden{display:none!important}
+  .page-pane:not(.hidden){display:block!important}
+  body.printing-subpage .bar,
+  body.printing-subpage .pb,
+  body.printing-subpage .page-pane.hidden{display:none!important}
+  body.printing-subpage main{padding:0!important;margin:0!important}
+  body.printing-subpage #schedSec,
+  body.printing-subpage #paybackSec{break-before:avoid!important;page-break-before:avoid!important;margin-top:0!important}
+  @page{size:A4;margin:10mm}
+  .out,.sub-box,.sub-box-2,.total-row,.ann-item,label,.grid>*,.bar{break-inside:avoid;page-break-inside:avoid}
+  body:not(.printing-subpage) .pb{display:none!important;height:0;margin:0}
+  section{page-break-inside:avoid}
+  #schedSec thead{display:table-header-group}
+}
+@media (max-width:600px){
+  .grid,.sub-box,.total-row,.grid-3{grid-template-columns:repeat(2,1fr)}
+  .ann-item{grid-template-columns:1fr}
+  .total-pair{grid-template-columns:1fr}
+  .total-pair .sw{transform:rotate(90deg)}
+}
+
+/* Compact Sizing Override (V17 Test) */
+main{max-width:940px;padding:10px 10px 32px;gap:10px}
+section{border-radius:11px}
+section>h2{padding:7px 12px;font-size:13px;gap:6px}
+section>h2 small{font-size:10px;margin-inline-start:6px}
+.mode-switch{padding:2px;border-radius:7px}
+.mode-btn{padding:3px 9px;font-size:11px;border-radius:5px}
+.toggle-pill{padding:3px 9px;font-size:11px;border-radius:7px}
+.grid{gap:7px;padding:10px}
+.grid-2,.grid-3{gap:7px}
+label{padding:6px 7px;border-radius:8px;font-size:11px}
+label small{font-size:9.5px;margin-top:0}
+input{margin-top:4px;padding:5.5px 5px;font-size:13.5px;border-radius:7px;border-width:1.2px}
+input[data-txt="1"]{font-size:12.5px}
+.yrs-meta{margin-top:4px;padding:2.5px 5px;font-size:10px;border-radius:6px}
+.yrs-meta b{font-size:11px}
+.sub-box,.sub-box-2{gap:7px;padding:8px;border-radius:9px}
+.sub-box-title{font-size:11px}
+.total-row{gap:7px;padding:8px 9px;border-radius:10px}
+.total-pair{gap:6px;padding-bottom:6px}
+.total-pair .sw{font-size:17px}
+.total-pair p{font-size:10px}
+.out{padding:6.5px 6px;border-radius:8px}
+.out span{font-size:10.5px}
+.out span small{font-size:9.5px}
+.out b{font-size:14.5px;margin-top:3px}
+.out.big b{font-size:16.5px}
+.status-banner{padding:6.5px 8px;font-size:11px;border-radius:8px}
+.ann-item{padding:6.5px 7px;gap:6px;border-radius:8px}
+.inst-display-bar{padding:6px 9px;border-radius:8px}
+.inst-display-bar span{font-size:11px}
+.wrap{padding:0 6px 8px}
+table{font-size:11.5px}
+th{padding:5px 4px;font-size:11px}
+th small{font-size:9px}
+td{padding:4.5px 4px}
+.actions{gap:8px}
+button{padding:7px 13px;font-size:12px;border-radius:8px}
+.hint-bar{font-size:10.5px;margin-top:-3px}
+.page-tabs{gap:6px;padding:5px;border-radius:11px}
+.page-tab{padding:7px 10px;font-size:12px;border-radius:8px}
+.page-tab small{font-size:9.5px}
+.page-pane{gap:10px}
+
+
+/* Ultra-Compact Override (V18 Test) */
+.bar{padding:7px 12px;gap:8px}
+.bar h1{font-size:13.5px}
+.bar small{font-size:9.5px}
+.dev-badge{display:flex;width:fit-content;margin:4px auto 0;padding:3px 14px;font-size:12px}
+.theme-btn{padding:4px 8px;font-size:11px;border-radius:7px}
+.roi b{font-size:22px}
+.roi span{font-size:9.5px}
+
+main{max-width:980px;padding:8px 8px 24px;gap:7px}
+section{border-radius:9px}
+section>h2{padding:5px 10px;font-size:12px;gap:5px}
+section>h2 small{font-size:9px;margin-inline-start:4px}
+.mode-switch{padding:1.5px;border-radius:6px}
+.mode-btn{padding:2px 7px;font-size:10px;border-radius:4px}
+.toggle-pill{padding:2px 7px;font-size:10px;border-radius:6px}
+
+.grid{gap:5px;padding:7px}
+.grid-2,.grid-3{gap:5px}
+label{padding:4px 5.5px;border-radius:6px;font-size:10px}
+label small{font-size:8.5px;margin-top:0}
+input{margin-top:2.5px;padding:3.5px 4px;font-size:12px;border-radius:6px;border-width:1px}
+input[data-txt="1"]{font-size:11.5px}
+
+.yrs-meta{margin-top:3px;padding:1.5px 4px;font-size:9px;border-radius:5px;gap:2px}
+.yrs-meta b{font-size:10px}
+
+.sub-box,.sub-box-2{gap:5px;padding:6px;border-radius:7px;border-width:1px}
+.sub-box-title{font-size:10px;margin-bottom:-1px}
+.total-row{gap:5px;padding:6px 7px;border-radius:8px;border-width:1px}
+.total-pair{gap:4px;padding-bottom:4px}
+.total-pair .sw{font-size:14px}
+.total-pair p{font-size:9px;line-height:1.25}
+
+.out{padding:4.5px 5px;border-radius:6px}
+.out span{font-size:9.5px;line-height:1.2}
+.out span small{font-size:8.5px;margin-top:0}
+.out b{font-size:12.5px;margin-top:2px}
+.out.big b{font-size:14px}
+
+.status-banner{padding:4.5px 6px;font-size:10px;border-radius:6px}
+.ann-item{padding:4.5px 5.5px;gap:5px;border-radius:6px}
+.del-btn{padding:5px 8px;font-size:10.5px;border-radius:6px}
+.add-ann-btn{padding:4.5px 9px;font-size:10.5px;border-radius:6px}
+.inst-display-bar{padding:4.5px 7px;border-radius:6px}
+.inst-display-bar span{font-size:10px}
+
+.wrap{padding:0 5px 6px}
+table{font-size:10.5px}
+th{padding:3.5px 3px;font-size:9.5px}
+th small{font-size:8px}
+td{padding:3px 3px}
+
+.actions{gap:6px}
+button{padding:5.5px 10px;font-size:11px;border-radius:7px}
+.hint-bar{font-size:9.5px;margin-top:-2px}
+
+.page-tabs{gap:5px;padding:4px;border-radius:9px}
+.page-tab{padding:5px 8px;font-size:11px;border-radius:6px}
+.page-tab small{font-size:8.5px}
+.page-pane{gap:7px}
+
+
+/* Test Override: Make Buttons More Prominent for All */
+button{font-weight:700;padding:7px 14px;font-size:12px;border-width:1.8px;border-radius:8px;box-shadow:0 1px 3px rgba(31,42,68,.12)}
+button.primary{background:var(--navy);color:var(--gold2);border-color:var(--gold)}
+button.danger{background:rgba(179,38,30,.08);color:var(--bad);border-color:var(--bad)}
+.mode-switch{padding:2.5px;gap:2px;background:rgba(255,255,255,.14);border:1.5px solid var(--gold);border-radius:8px}
+.mode-btn{padding:4px 10px;font-size:11px;font-weight:700;border-radius:6px;border:1px solid transparent}
+.mode-btn:not(.active){background:rgba(255,255,255,.06);border-color:rgba(232,199,122,.28)}
+.mode-btn.active{background:var(--gold);color:#1f2a44;border-color:var(--gold2);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+/* Resale buttons: box background is light, so inactive buttons get dark navy bg to keep white text readable */
+#resalePage3 .mode-btn{background:#1f2a44!important;color:#fff!important;border:1px solid #1f2a44!important}
+#resalePage3 .mode-btn.active{background:var(--gold)!important;color:#1f2a44!important;border-color:var(--gold2)!important}
+.toggle-pill{padding:4px 11px;font-size:11px;font-weight:700;border-width:1.5px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle-pill.on{background:var(--gold);color:#1f2a44;border-color:var(--gold2)}
+.add-ann-btn{padding:6px 12px;font-size:11.5px;font-weight:700;border-style:solid;border-width:1.5px;border-color:var(--gold);background:rgba(184,146,74,.18);color:var(--ink);border-radius:8px;box-shadow:0 1px 3px rgba(31,42,68,.1)}
+.del-btn{padding:6px 10px;font-size:11px;font-weight:700;border-width:1.5px;border-color:var(--bad);background:rgba(179,38,30,.08);color:var(--bad);border-radius:7px}
+.page-tab{padding:7px 12px;font-size:12px;font-weight:700;border:1.5px solid var(--line);border-radius:9px;box-shadow:0 1px 3px rgba(31,42,68,.08)}
+.page-tab.active{background:var(--navy);color:var(--gold2);border-color:var(--gold);box-shadow:0 2px 6px rgba(31,42,68,.22)}
+.theme-btn{padding:5px 10px;font-size:12px;font-weight:700;border-width:1.5px;border-color:var(--gold);background:rgba(232,199,122,.14)}
+
+
+/* Test Enhancement: Quick Offer Summary & WhatsApp Toast */
+.quick-sum{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:6px;background:var(--card);border:1.5px solid var(--gold);border-radius:9px}
+.qs-box{background:var(--pale);border-radius:6px;padding:4px 5px;text-align:center}
+.qs-box span{display:block;font-size:9px;color:var(--mute);font-weight:600}
+.qs-box b{display:block;font-size:11.5px;color:var(--ink);margin-top:1px;font-variant-numeric:tabular-nums}
+.qs-box.hi{background:var(--navy)}
+.qs-box.hi span{color:var(--gold2)}
+.qs-box.hi b{color:var(--gold2)}
+.copy-toast{font-size:10.5px;font-weight:700;color:var(--good);text-align:center;min-height:16px}
+@media print{.quick-sum,.copy-toast{display:none!important}}
+@media (max-width:700px){.quick-sum{grid-template-columns:repeat(3,1fr)}}
+
+
+/* Lock/Unlock Inputs Toggle */
+.lock-btn{padding:5px 10px;border-radius:7px;border:1.5px solid var(--gold);background:rgba(232,199,122,.14);color:var(--gold2);font:700 11px Cairo,Tahoma,sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.lock-btn.locked{background:var(--bad);color:#fff;border-color:#ff8a80}
+body.sheet-locked input, body.sheet-locked select{pointer-events:none;opacity:.78;background:var(--pale)!important}
+body.sheet-locked #btnExt, body.sheet-locked #btnReady, body.sheet-locked #btnUnderConst, body.sheet-locked #btnInst, body.sheet-locked #btnCash, body.sheet-locked #btnStepRent, body.sheet-locked #btnEqual, body.sheet-locked #btnWithAnn, body.sheet-locked #addAnnBtn, body.sheet-locked .del-btn, body.sheet-locked #clearBtn{pointer-events:none;opacity:.55}
+@media print{.lock-btn{display:none!important}}
+
+
+/* Page 3: Payback Period Test Styles */
+/* TEST Bold numbers Payback */ #pbRows td{font-weight:700!important;font-size:13.5px!important} #pbRows td small{font-weight:600!important} #pbRows td b{font-weight:800!important} /* TEST Bold numbers whole sheet */ .out b, table td, .roi b, .total-row b, .count-box b, .inst-values-grid .out b{font-weight:800!important} table td{font-size:13.5px!important} .out b{font-size:15px!important} .roi b{font-size:38px!important} .pb-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+.pb-badge.done{background:rgba(30,107,69,.15);color:var(--good)}
+.pb-badge.prog{background:rgba(184,146,74,.16);color:var(--gold)}
+.pb-badge.wait{background:var(--pale);color:var(--mute)}
+@media (max-width:600px){.page-tabs{grid-template-columns:1fr}}
+
+
+/* Strictly uniform height, width, and layout across all 3 boxes in the discount row */
+.total-row{align-items:start!important;grid-template-columns:repeat(3,1fr)!important;gap:10px!important}
+#w_discWithGarage{display:grid!important;grid-template-columns:1fr!important;gap:6px!important;width:100%!important;margin:0!important;padding:0!important;background:transparent!important;border:none!important}
+#w_discWithGarage > label{display:flex!important;flex-direction:column!important;justify-content:space-between!important;align-items:stretch!important;width:100%!important;height:84px!important;min-height:84px!important;max-height:84px!important;padding:8px 10px!important;margin:0!important;border-radius:10px!important;font-size:11.5px!important;line-height:1.25!important;box-sizing:border-box!important}
+#w_discWithGarage > label .lbl-txt small{font-size:9.5px!important;line-height:1.15!important}
+#w_discWithGarage > label input{margin-top:4px!important;padding:4px 6px!important;height:30px!important;font-size:14px!important;line-height:1.2!important;width:100%!important;box-sizing:border-box!important}
+#w_discWithGarage > #btnGarage{padding:3px 10px!important;font-size:10.5px!important;line-height:1.35!important}
+#w_finalCard{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;width:100%!important;margin:0!important;padding:0!important;background:transparent!important;border:none!important}
+#discAmt.out,
+#final.out{display:flex!important;flex-direction:column!important;justify-content:space-between!important;align-items:center!important;width:100%!important;height:84px!important;min-height:84px!important;max-height:84px!important;padding:8px 10px!important;margin:0!important;border-radius:10px!important;box-sizing:border-box!important}
+#discAmt.out span,
+#final.out span{margin:0!important;font-size:11.5px!important;line-height:1.25!important}
+#discAmt.out span small,
+#final.out span small{font-size:9.5px!important;line-height:1.15!important}
+#discAmt.out b,
+#final.out b{margin:0!important;font-size:16px!important;line-height:1.25!important}
+
+
+/* FINAL: رقم القسط = نفس حجم رقم الشهر (84) بالظبط */
+.count-box b{font-size:11.5px!important}
+.inst-values-grid .out b{font-size:11.5px!important;line-height:1.2}
+
+/* FINAL FIX: رقم القسط = رقم الشهر (84) نفس الحجم والوزن بالظبط */
+.inst-values-grid .out b{font-size:11.5px!important;font-weight:700!important;line-height:1.2!important}
+.count-box, .count-box b{font-size:11.5px!important;font-weight:700!important}
+ .inst-date{font-family:inherit} @media print{ .inst-date{border:none!important;padding:0!important} }  @media print{ #firstInstRow{display:none!important} #firstInstPrint{display:block!important} } @media screen{ #firstInstPrint{display:none} } </style>
+<style>
+/* TEST1 - Big Numbers: Final Price / ROI / Payback */
+#final.out{height:auto!important;min-height:96px!important;max-height:none!important}
+#final.out b{font-size:26px!important;line-height:1.2!important}
+.out.big b{font-size:24px!important;line-height:1.2!important}
+.roi b{font-size:38px!important}
+@media (max-width:600px){
+  #final.out b{font-size:22px!important}
+  .out.big b{font-size:20px!important}
+  .roi b{font-size:32px!important}
+}
+</style>
+<style>
+/* FINAL: رقم القسط = رقم الشهر، حتى في المربع الغامق */
+.inst-values-grid .out.big b, .inst-values-grid .out b{font-size:11.5px!important;font-weight:700!important;line-height:1.2!important}
+.count-box, .count-box b{font-size:11.5px!important;font-weight:700!important}
+</style>
+<style>
+/* اللي يختفي الرقم بس، المربع يفضل باين فاضي */
+.inst-values-grid .out.num-hidden b{visibility:hidden!important}
+.inst-values-grid .out.num-hidden{visibility:visible!important}
+/* مربع القسط = نفس حجم زرار العرض اللي فوقه (34px) */
+.inst-values-grid .out{height:34px!important;min-height:34px!important;max-height:34px!important}
+.inst-values-grid .out span:empty{display:none!important}
+</style>
+<style>
+/* رقم القسط أكبر حتة صغيرة جداً: من 11.5 لـ 13 */
+.inst-values-grid .out.big b, .inst-values-grid .out b{font-size:13px!important}
+</style>
+<style>
+/* PRINT FIX: الهيدر والألوان ميبهتوش، وصفحة الـ Payback متتقطعش */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  @page{size:A4;margin:10mm}
+  body{background:#fff!important;color:#1f2a44!important}
+  /* الهيدر يفضل باين بألوانه */
+  .bar{display:flex!important;background:#1f2a44!important;color:#fff!important;border-bottom:3px solid #b8924a!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .bar *, .bar b, .bar span{color:#fff!important}
+  .bar .dev-badge{background:#b8924a!important;color:#1f2a44!important}
+  /* المربعات الغامقة متبهتش */
+  .out.big{background:#1f2a44!important;color:#fff!important;border-color:#1f2a44!important}
+  .out.big span{color:#e8c77a!important}
+  .out.big b{color:#fff!important}
+  .out{background:#e9edf5!important;border-color:#d9dfec!important}
+  /* المدخلات متبهتش */
+  input, select{background:#fff!important;color:#1f2a44!important;border:1.2px solid #d9dfec!important}
+  label{background:#fff!important}
+  /* صفحة الـ Payback: متتقطعش من نصها */
+  #paybackSec{break-inside:auto!important;page-break-inside:auto!important;break-before:auto}
+  #paybackSec > h2{break-inside:avoid!important;break-after:avoid!important;page-break-after:avoid!important}
+  #paybackSec table{break-inside:auto!important;page-break-inside:auto!important}
+  #paybackSec thead{display:table-header-group!important}
+  #paybackSec tr{break-inside:avoid!important;page-break-inside:avoid!important}
+  #paybackSec .grid, #paybackSec .total-row, #paybackSec .out, #paybackSec .sub-box{break-inside:avoid!important;page-break-inside:avoid!important}
+  section{break-inside:auto!important;page-break-inside:auto!important}
+  section > h2{break-inside:avoid!important;break-after:avoid!important}
+  /* إخفاء اللي ملوش لازمة في الطباعة بس */
+  .actions, .hint-bar, .theme-btn, .mode-switch, .toggle-pill, .del-btn, .add-ann-btn, .page-tabs, .pb, .quick-sum, .copy-toast, .lock-btn, .inst-display-bar{display:none!important}
+}
+</style>
+<style>
+/* إخفاء هيدر/فوتر المتصفح في الطباعة (اسم الملف + اللينك) */
+@media print{
+  @page{size:A4;margin:0}
+  body{padding:10mm!important}
+  main{padding:0!important}
+}
+</style>
+<style>
+/* تثبيت شريط الواتساب والطباعة - يفضل باين على طول */
+.actions{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:999!important;display:flex!important;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;padding:6px 12px calc(6px + env(safe-area-inset-bottom))!important;background:rgba(255,255,255,.96)!important;backdrop-filter:blur(8px);border-top:2px solid var(--gold)!important;box-shadow:0 -6px 24px rgba(0,0,0,.18)!important}
+[data-theme="dark"] .actions{background:rgba(18,24,38,.96)!important}
+.actions button{margin:0!important;padding:7px 14px!important;font-size:12.5px!important}
+body{padding-bottom:58px!important}
+@media (max-width:600px){
+  .actions{gap:6px;padding:5px 8px calc(5px + env(safe-area-inset-bottom))!important}
+  .actions button{flex:1 1 auto;font-size:11.5px!important;padding:7px 6px!important}
+  body{padding-bottom:68px!important}
+}
+@media print{
+  .actions{display:none!important}
+  body{padding-bottom:0!important}
+}
+</style>
+
+
+
+
+
+
+</head>
+<body>
+<div class="bar">
+  <div>
+    <h1>خطة السداد والعائد <small>Payment Plan &amp; ROI Calculator</small></h1>
+  </div>
+  <div class="dev-badge">Developed by Mohamed Eldaly</div>
+  <div class="bar-actions" style="justify-self:end">
+    <button class="lock-btn" id="lockBtn" type="button" title="قفل / فتح تعديل البيانات | Lock / Unlock Inputs">🔓 مفتوح | Unlocked</button>
+    <button class="theme-btn" id="themeBtn" type="button" title="تبديل المظهر | Toggle Theme">🌓</button>
+    <div class="roi"><b id="roiTop">0.0%</b><span id="roiTopSub">العائد ROI (أول سنة تشغيل)</span></div>
+  </div>
+</div>
+<main>
+  <div class="page-tabs" role="tablist" aria-label="صفحات الحاسبة | Calculator Pages">
+    <button type="button" class="page-tab active" id="tabPage1" role="tab" aria-selected="true">
+      <span>١. الوحدة وخطة السداد والعائد (ROI)</span>
+      <small>Unit, Payment Plan &amp; ROI</small>
+    </button>
+    <button type="button" class="page-tab" id="tabPage2" role="tab" aria-selected="false">
+      <span>٢. جدول السداد التفصيلي</span>
+      <small>Payment Schedule</small>
+    </button>
+    <button type="button" class="page-tab" id="tabPage3" role="tab" aria-selected="false">
+      <span>٣. فترة استرداد رأس المال</span>
+      <small>Payback Period</small>
+    </button>
+
+  </div>
+
+    <div id="page1" class="page-pane">
+    <section>
+      <h2>
+        <span>الوحدة <small>Unit</small></span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <div class="mode-switch" role="group" aria-label="حالة الاستلام | Delivery Status">
+            <button type="button" class="mode-btn" id="btnReady">استلام فوري | Ready to Move</button>
+            <button type="button" class="mode-btn active" id="btnUnderConst">تحت الإنشاء | Under Construction</button>
+          </div>
+        </div>
+      </h2>
+      <div class="grid" id="g1"></div>
+    </section>
+    <section>
+      <h2>
+        <span>خطة السداد <small>Payment Plan</small></span>
+        <div class="mode-switch" role="group" aria-label="نظام السداد | Payment Mode">
+          <button type="button" class="mode-btn active" id="btnInst">تقسيط | Installments</button>
+          <button type="button" class="mode-btn" id="btnCash">كاش | Cash</button>
+        </div>
+      </h2>
+      <div class="grid" id="g2"></div>
+    </section>
+    <section>
+      <h2>
+        <span>الإيجار والعائد <small>Rent &amp; ROI</small></span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <button type="button" class="toggle-pill" id="btnStepRent">+ زيادة متدرجة | Step-up Rent</button>
+        </div>
+      </h2>
+      <div class="grid" id="g3"></div>
+    </section>
+    <section>
+      <h2><span>العائد سنة بسنة <small>Year by Year</small></span></h2>
+      <div class="wrap"><table>
+        <thead>
+          <tr>
+            <th>السنة <small>Year</small></th>
+            <th>إيجار المتر الداخلي <small>Int. Rent / m²</small></th>
+            <th>إيجار المتر الخارجي <small>Ext. Rent / m² (⅓)</small></th>
+            <th>الإيجار السنوي <small>Annual Rent</small></th>
+            <th>المدفوع <small>Paid Amount</small></th>
+            <th>نسبة المدفوع <small>Paid %</small></th>
+            <th>العائد <small>ROI</small></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table></div>
+      <div class="grid" id="g4"></div>
+    </section>
+  </div>
+
+  <div class="pb"></div>
+
+  <div id="page2" class="page-pane hidden">
+    <section id="schedSec">
+      <h2>
+        <span>جدول السداد <small>Payment Schedule</small></span>
+        <div class="mode-switch" id="schedFreqSwitch" role="group" aria-label="دورية جدول السداد | Schedule Frequency">
+          <button type="button" class="mode-btn" id="schedM">شهري | Monthly</button>
+          <button type="button" class="mode-btn active" id="schedQ">ربع سنوي | Quarterly</button>
+          <button type="button" class="mode-btn" id="schedY">سنوي | Annual</button>
+        </div>
+      </h2>
+      <div class="grid" id="g5"></div>
+      <div class="grid" id="firstInstRow" style="margin-top:8px"><label><span class="lbl-txt">أول قسط بعد كام شهر من التعاقد<small>First Installment After (Months)</small></span><input id="firstInstOffset" inputmode="decimal" placeholder="مثال: 2 = أول قسط بعد شهرين" oninput="window.__onFirstOffset(this)"></label><label><span class="lbl-txt">أو تاريخ أول قسط<small>Or First Installment Date</small></span><input id="firstInstDate" type="date" onchange="window.__onFirstDate(this)"></label></div>
+      <div id="firstInstPrint" style="padding:8px 12px;font-weight:700;font-size:13px">أول قسط بعد: <span id="firstInstPrintVal">—</span></div>
+      <div class="wrap"><table style="min-width:440px">
+        <thead>
+          <tr>
+            <th>الدفعة <small>Installment</small></th>
+            <th>النسبة <small>Percentage</small></th>
+            <th>التاريخ <small>Date</small></th>
+            <th>المبلغ <small>Amount</small></th>
+          </tr>
+        </thead>
+        <tbody id="sched"></tbody><tfoot id="sfoot"></tfoot>
+      </table></div>
+    </section>
+  </div>
+
+  <div class="pb"></div>
+
+  <div id="page3" class="page-pane hidden">
+    <section id="paybackSec">
+      <h2>
+        <span>تحليل استرداد ثمن الوحدة من الإيجار <small>Unit Price Payback Analysis</small></span>
+        <div class="mode-switch" role="group" aria-label="أساس الاسترداد | Payback Target Base">
+          <button type="button" class="mode-btn active" id="pbBaseUnit">سعر الوحدة النهائي | Unit Final Price</button>
+          <button type="button" class="mode-btn" id="pbBaseGrand">الإجمالي شامل الصيانة والجراج | Grand Total</button>
+        </div>
+      </h2>
+      <div class="grid" id="g6"></div>
+      <div id="resalePage3" style="margin-top:10px"></div>
+      <div class="wrap"><table style="min-width:640px">
+        <thead>
+          <tr>
+            <th>السنة <small>Year</small></th>
+            <th>الإيجار السنوي <small>Annual Rent</small></th>
+            <th>إجمالي الإيجار التراكمي <small>Cumulative Rent</small></th>
+            <th>نسبة الاسترداد <small>Recovered %</small></th>
+            <th>المتبقي للاسترداد <small>Remaining to Recover</small></th>
+            <th>الحالة <small>Status</small></th>
+            <th>صافي الربح <small>Net Profit</small></th>
+          </tr>
+        </thead>
+        <tbody id="pbRows"></tbody>
+      </table></div>
+    </section>
+  </div>
+  <div class="actions">
+        <button type="button" id="waBtn" style="border-color:var(--good);color:var(--good);background:rgba(30,107,69,.08)"><svg viewBox="0 0 24 24" width="18" height="18" fill="#25D366" style="vertical-align:-3px;flex:none" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> نسخ عرض واتساب | Copy WhatsApp</button>
+    <button class="primary" id="printBtn" type="button">🖨️ طباعة / حفظ PDF | Print &amp; Save PDF</button>
+    <button class="danger" id="clearBtn" type="button">🔄 تصفير / وحدة جديدة | Reset &amp; New Unit</button>
+  </div>
+    <div class="copy-toast" id="copyToast"></div>
+  <div class="hint-bar" id="pmStatus">العائد الاستثماري مرتبط تلقائياً بأول سنة تشغيل واستلام في الجدول | ROI synced with 1st operational year</div>
+</main>
+<script>
+const D={ain:60,aout:20,ppm:270000,disc:15,dp:15,delivDp:0,yrs:7,deliv:3,rent:1700,grow:10,stepYr:3,stepGrow:12,maint:8,garage:0,resaleYears:5,resaleGrow:8};
+const $=id=>document.getElementById(id);
+const clean=s=>String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٫]/g,'.').replace(/[,٬\s]/g,'');
+const num=s=>{const n=parseFloat(clean(s));return isFinite(n)?n:0};
+const fm=n=>Math.round(n).toLocaleString('en-US');
+const pc=(n,d=0)=>(n*100).toFixed(d)+'%';
+const roiFmt=r=>(r*100).toFixed(1)+'%';
+
+const fld=(id,l,en,wrapId='',cls='')=>`<label ${wrapId?`id="${wrapId}"`:''} ${cls?`class="${cls}"`:''}><span class="lbl-txt">${l}<small>${en}</small></span><input id="${id}" inputmode="decimal" autocomplete="off"></label>`;
+const fldt=(id,l,en,t,wrapId='',cls='')=>`<label ${wrapId?`id="${wrapId}"`:''} ${cls?`class="${cls}"`:''}><span class="lbl-txt">${l}<small>${en}</small></span><input id="${id}" type="${t}" data-txt="1" autocomplete="off"></label>`;
+const out=(id,l,en,big=0,wrapId='',cls='')=>`<div ${wrapId?`id="${wrapId}"`:''} class="out${big?' big':''}${cls?' '+cls:''}"><span>${l}<small>${en}</small></span><b id="${id}">0</b></div>`;
+
+$('g1').innerHTML=
+  `<div class="sub-box" id="intBox">
+    <div class="sub-box-title" id="intBoxTitle">المساحة الداخلية + الخارجية (⅓ سعر المتر الداخلي) | Internal + External Area (⅓)</div>
+    ${fld('ain','مساحة داخلية (م²)','Internal Area (m²)')}
+    ${fld('ppm','سعر المتر الداخلي','Internal Price / m²')}
+    ${out('intTotal','إجمالي الداخلي','Internal Total Price')}
+    <div id="extMergedWrap" class="grid-full" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:8px;margin-top:2px;border-top:1px dashed var(--gold)">
+      ${fld('aout','مساحة خارجية (م²)','External Area (m²)')}
+      ${out('ppmOut','سعر المتر الخارجي (⅓)','External Price / m²')}
+      ${out('extTotal','إجمالي الخارجي','External Total Price')}
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:7px">
+    <button type="button" class="toggle-pill on" id="btnExt">✓ مساحة خارجية مفعّلة | External Area ON</button>
+  </div>`+
+  `<div class="total-row">
+    <div class="total-pair">
+      ${fld('total','إجمالي الوحدة قبل الخصم','Total Before Discount')}
+      <div class="sw" aria-hidden="true">⇄</div>
+      ${out('effArea','المساحة المكافئة (داخلي + ⅓ خارجي)','Equivalent Area (Int + ⅓ Ext)')}
+      <p id="pairHint">يمكنك التعديل في سعر المتر الداخلي أو إجمالي الوحدة قبل الخصم وسيتم تحديث الطرف الآخر تلقائياً | Edit Internal Price/m² or Total Before Discount to auto-sync.</p>
+    </div>
+    <div id="garageBox" class="sub-box hidden" style="margin-top:2px;grid-template-columns:1fr">
+      <div class="sub-box-title">الجراج | Garage</div>
+      ${fld('garage','سعر الجراج','Garage Price')}
+    </div>
+    <div id="garageRow" class="garage-row">
+      <button type="button" class="toggle-pill" id="btnGarage">+ جراج | Garage</button>
+    </div>
+    <div id="discRow" class="disc-row">
+    ${fld('disc','خصم %','Discount %')}
+    ${fld('discAmtIn','قيمة الخصم','Discount Amount')}
+    <div id="w_finalCard" style="display:flex;flex-direction:column;gap:4px">
+      ${out('final','السعر النهائي','Final Price',1)}
+      <button type="button" class="toggle-pill hidden" id="btnHideBaseTotal" style="align-self:center;font-size:10px;padding:2px 8px">إخفاء السعر لوحده | Hide Base Total</button>
+    </div>
+    </div>
+    <div id="unhideBaseBar" class="grid-full hidden" style="text-align:center">
+      <button type="button" class="toggle-pill on" id="btnShowBaseTotal" style="font-size:10px;padding:2px 10px">✓ إظهار السعر الأساسي أيضاً | Show Base Total</button>
+    </div>
+  </div>`;
+
+$('g2').innerHTML=
+  `<div id="cashBanner" class="status-banner hidden">نظام الدفع: كاش 100% عند التعاقد — بدون أقساط | Payment Mode: 100% Cash Upfront</div>`+
+  `<div id="g2_inputs" class="grid-3" style="grid-template-columns:1fr 1fr">
+    <div class="paired-col">
+      ${fld('dp','نسبة المقدم %','Down Payment %','w_dp')}
+      ${fld('dpAmtIn','مقدم التعاقد','Down Payment Amount','w_dpAmt')}
+    </div>
+    <div class="paired-col">
+      <label id="w_yrs">
+        <span class="lbl-txt">عدد سنوات القسط<small>Installment Years</small></span>
+        <input id="yrs" inputmode="decimal" autocomplete="off">
+      </label>
+      <div id="w_dispBar" class="inst-stack">
+        <div class="inst-display-bar disp-compact">
+          <span>طريقة عرض القسط | Installment View:</span>
+          <div class="disp-grid">
+            <button type="button" class="mode-btn" id="dispM" style="color:var(--ink)">شهري | Monthly</button>
+            <button type="button" class="mode-btn active" id="dispQ" style="color:var(--ink)">ربع سنوي | Quarterly</button>
+            <button type="button" class="mode-btn" id="dispY" style="color:var(--ink)">سنوي | Annual</button>
+            <button type="button" class="mode-btn" id="dispAll" style="color:var(--ink)">خيار الكل | Show All</button>
+          </div>
+        </div>
+        <div id="g2_instOuts" class="inst-values-grid">
+          ${out('qm','','',1,'w_qm')}
+          ${out('qq','','',1,'w_qq')}
+          ${out('qy','','',1,'w_qy')}
+          
+        </div>
+        <div class="counts-grid" id="instCountsRow">
+          <div class="count-box"><b id="cntMonths">84</b> شهر | Mo</div>
+          <div class="count-box"><b id="cntQuarters">28</b> كوارتر | Qtr</div>
+          <div class="count-box"><b id="cntYears">7</b> سنة | Yr</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>`+
+  `<div id="w_instType" class="sub-box" style="align-items:center">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;grid-column:1/-1">
+      <span style="font-size:12.5px;font-weight:700;color:var(--ink)">نظام الأقساط | Installment Type:</span>
+      <div class="mode-switch" style="background:var(--pale);border-color:var(--gold)">
+        <button type="button" class="mode-btn active" id="btnEqual" style="color:var(--ink)">أقساط متساوية | Equal</button>
+        <button type="button" class="mode-btn" id="btnWithAnn" style="color:var(--ink)">بدفعات | With Extra Payments</button>
+      </div>
+    </div>
+    <div id="annContainer" class="ann-list hidden">
+      <div id="annItems" style="display:grid;gap:8px"></div>
+      <button type="button" class="add-ann-btn" id="addAnnBtn">+ إضافة دفعة | Add Payment</button>
+    </div>
+  </div>`+
+  `<div id="g2_dpOuts" class="grid-3">
+    ${out('annTotalOut','إجمالي الدفعات الإضافية','Total Periodic Payments',0,'w_annTotalOut')}
+  </div>`+
+  `<div id="delivRow" style="display:flex;flex-direction:column;gap:7px">
+    <button type="button" class="toggle-pill" id="btnDelivDp">+ دفعة استلام | Delivery Payment</button>
+    <div id="delivBox" class="sub-box hidden" style="grid-template-columns:1fr 1fr">
+      <div class="sub-box-title">دفعة الاستلام | Delivery Payment</div>
+      ${fld('delivDp','دفعة استلام %','Delivery Payment %','w_delivDp')}
+      ${out('delivDpAmt','قيمة دفعة الاستلام','Delivery Payment Amount',0,'w_delivDpAmt')}
+    </div>
+  </div>`+
+  out('cashAmt','إجمالي مبلغ الكاش المستحق','Total Cash Amount Due',1,'w_cashAmt','grid-full');
+
+$('g3').innerHTML=
+  `<div id="readyBanner" class="status-banner hidden">حالة الوحدة: استلام فوري — يبدأ الإيجار والعائد من السنة الأولى | Status: Ready to Move (Rent &amp; ROI from Year 1)</div>`+
+  `<div id="g3_row1" class="grid-3">
+    ${fld('rent','إيجار المتر الداخلي / شهر','Internal Rent / m² / Month')}
+    ${out('rentOut','إيجار المتر الخارجي / شهر (⅓)','External Rent / m² / Month',0,'w_rentOut')}
+    ${fld('grow','زيادة الإيجار السنوية %','Annual Rent Increase %')}
+  </div>`+
+  `<div id="g3_delivRow" class="sub-box-2">
+    <div class="sub-box-title">موعد الاستلام (مرتبط تلقائياً ⇄ مع تاريخ التعاقد) | Delivery Schedule (Auto-Synced ⇄)</div>
+    ${fld('deliv','سنوات حتى الاستلام','Years to Delivery','w_deliv')}
+    ${fldt('ddate','تاريخ استلام المشروع (شهر وسنة)','Project Delivery (Month & Year)','month','w_ddate')}
+  </div>`+
+  `<div id="g3_stepRow" class="sub-box-2 hidden">
+    <div class="sub-box-title">زيادة إيجار متدرجة | Step-up Rent Increase</div>
+    ${fld('stepYr','الزيادة الجديدة من السنة رقم','New Increase From Year #','w_stepYr')}
+    ${fld('stepGrow','نسبة الزيادة الجديدة %','New Annual Increase %','w_stepGrow')}
+  </div>`+
+  `<div id="g3_row3" class="grid-3">
+    ${out('rm','إيجار شهري (أول سنة تشغيل)','Monthly Rent (1st Op. Year)')}
+    ${out('rq','إيجار ربع سنوي (أول سنة تشغيل)','Quarterly Rent (1st Op. Year)')}
+    ${out('ry','إيجار سنوي (أول سنة تشغيل)','Annual Rent (1st Op. Year)')}
+  </div>`+
+  `<div id="g3_row4" class="grid-3" style="grid-template-columns:repeat(4,1fr)">
+    ${out('paid','قيمة المدفوع (حتى أول سنة تشغيل)','Total Paid (at 1st Op. Year)')}
+    ${out('paidPct','نسبة المدفوع','Paid Percentage')}
+    ${out('capRate','العائد على إجمالي السعر (Cap Rate)','Cap Rate',1)}
+    ${out('roi','العائد على المدفوع (Cash-on-Cash / ROE)','Cash-on-Cash / ROE Return',1)}
+  </div>`;
+
+if($('gNetInst')) $('gNetInst').innerHTML=
+  `<div class="sub-box-2">
+    <div class="sub-box-title">القسط من الإيجار | Installment Paid by Rent</div>
+    ${out('netQ','اللي هتدفعه من جيبك ربع سنوي (أول سنة تشغيل)','Out of Pocket per Quarter (1st Op. Year)',1)}
+    ${out('rentDuring','إجمالي الإيجار أثناء فترة التقسيط','Total Rent During Installment Period')}
+    ${out('coveredPct','نسبة تغطية الإيجار للأقساط','Rent Coverage of Installments')}
+    ${out('effCost','التكلفة الفعلية بعد الإيجار (اللي دفعته من جيبك)','Effective Cost After Rent',1)}
+  </div>`;
+
+$('g4').innerHTML=
+  out('cq','إيجار ربع سنوي (أول سنة تشغيل)','Quarterly Rent (1st Operational Year)')+
+  out('ci','القسط ربع السنوي','Quarterly Installment')+
+  out('cd','الإيجار − القسط (الفائض / العجز)','Rent − Installment (Surplus / Deficit)');
+
+$('g5').innerHTML=
+  fldt('proj','اسم المشروع','Project Name','text')+
+  fldt('client','اسم العميل','Client Name','text')+
+  fldt('unit','رقم الوحدة','Unit Number','text')+
+  fldt('cdate','تاريخ التعاقد','Contract Date','date')+
+  fld('maint','وديعة الصيانة % (اكتب 0 لإلغائها)','Maintenance Deposit % (0 to disable)')+
+  `<label><span class="lbl-txt">نوع الوحدة<small>Unit Type</small></span><input id="unitType" type="text" data-txt="1" list="unitTypeList" autocomplete="off" placeholder="اختر أو اكتب نوع الوحدة | Choose or type unit type"><datalist id="unitTypeList"><option value="وحدة تجارية | Commercial Unit"></option><option value="وحدة طبية | Medical Unit"></option><option value="وحدة إدارية | Administrative Unit"></option></datalist></label>`;
+
+$('resalePage3').innerHTML=
+  `<div id="g3_resaleRow" class="sub-box-2">
+    <div class="sub-box-title">قيمة إعادة البيع المتوقعة | Expected Resale Value</div>
+    <div class="grid-full" style="display:flex;gap:6px;flex-wrap:wrap">
+      <button type="button" class="mode-btn active" id="resaleBaseContract" onclick="setResaleBase('contract')">من التعاقد | From Contract</button>
+      <button type="button" class="mode-btn" id="resaleBaseOp" onclick="setResaleBase('operation')">من بداية التشغيل | From Operation Start</button>
+    </div>
+    ${fld('resaleYears','إعادة البيع بعد كام سنة؟','Resale After How Many Years?')}
+    ${fld('resaleGrow','زيادة سعر الوحدة السنوية %','Annual Unit Price Appreciation %')}
+    ${out('resaleVal','قيمة إعادة البيع المتوقعة','Expected Resale Value',1)}
+    ${out('resaleGain','صافي الربح المتوقع','Expected Net Gain',1)}
+  </div>`;
+
+$('g6').innerHTML=
+  out('pbTargetAmt','المبلغ المستهدف استرداده','Target Amount to Recover')+
+  out('pbOpYears','مدة الاسترداد من بداية التشغيل','Payback from Op. Start',1)+
+
+['disc','dp','delivDp','grow','stepGrow','maint','resaleGrow'].forEach(k=>$(k).dataset.pct=1);
+
+let src='ppm'; let discMode='pct'; let dpMode='pct';
+let delivSrc='yrs'; // 'yrs' | 'date'
+let payMode='installment'; // 'installment' | 'cash'
+let deliveryMode='under_construction'; // 'ready' | 'under_construction'
+let hasExt=true;
+let hasGarage=false;
+let hasDelivDp=false;
+let hideBaseTotal=false;
+let hasStepRent=false;
+let instType='equal';
+let resaleBase='contract'; // 'contract' | 'operation'
+function setResaleBase(base){ resaleBase=base; const c=$('resaleBaseContract'), o=$('resaleBaseOp'); if(c) c.classList.toggle('active',base==='contract'); if(o) o.classList.toggle('active',base==='operation'); if(typeof syncActiveCheckmarks==='function') syncActiveCheckmarks(); calc(); }
+function setResaleYears(y){ const el=$('resaleYears'); if(el) el.value=String(y); ['3','5','7','10'].forEach(v=>{ const b=$('resaleYr'+v); if(b) b.classList.toggle('active', String(y)===v); }); if(typeof syncActiveCheckmarks==='function') syncActiveCheckmarks(); calc(); } // 'equal' | 'annual'
+let instDisp='quarterly'; // 'quarterly' | 'monthly' | 'annual' | 'all'
+let schedFreq='quarterly'; // 'monthly' | 'quarterly' | 'annual'
+let pbBase='unit'; // 'unit' | 'grand'
+let annualPayments=[];
+let annIdSeq=1;
+let instDateOverrides={};
+let firstInstOffsetMonths=null;
+let firstInstDateStr='';
+window.__onFirstDate=function(el){ firstInstDateStr=el.value||''; if(firstInstDateStr){ const inp=$('firstInstOffset'); if(inp) inp.value=''; firstInstOffsetMonths=null; } calc(); };
+function instBaseDate(c0,i,stepMonths,firstOff){ if(firstInstDateStr){ const d=new Date(firstInstDateStr+'T00:00:00'); return addMonths(d, (i-1)*stepMonths); } return addMonths(c0, firstOff + (i-1)*stepMonths); }
+function instDateWithCascade(c0,i,stepMonths,firstOff,freqKey){
+  const base = instBaseDate(c0,i,stepMonths,firstOff);
+  const key = freqKey+'-'+i;
+  if(instDateOverrides[key]) return new Date(instDateOverrides[key]+'T00:00:00');
+  let latestDelta=null, latestJ=-1;
+  for(const k in instDateOverrides){ const parts=k.split('-'); if(parts[0]!==freqKey) continue; const j=parseInt(parts[1],10); if(j<i && j>latestJ){ const ov=new Date(instDateOverrides[k]+'T00:00:00'); const b=instBaseDate(c0,j,stepMonths,firstOff); latestDelta=ov.getTime()-b.getTime(); latestJ=j; } }
+  if(latestDelta!==null) return new Date(base.getTime()+latestDelta);
+  return base;
+}
+window.__onInstDate=function(el){
+  const freq=el.dataset.freq, idx=parseInt(el.dataset.idx,10);
+  const key=freq+'-'+idx;
+  if(el.value) instDateOverrides[key]=el.value; else delete instDateOverrides[key];
+  calc();
+};
+window.__onFirstOffset=function(el){ const v=el.value.trim()==='' ? null : num(el.value); firstInstOffsetMonths=v; if(v!==null){ firstInstDateStr=''; const d=$('firstInstDate'); if(d) d.value=''; } calc(); };;
+
+
+const G=id=>num($(id).value);
+function setv(id,v){if(document.activeElement!==$(id))$(id).value=fm(v)}
+
+const addMonths=(d,m)=>{
+  const x=new Date(d.getFullYear(),d.getMonth()+Math.round(m),1);
+  x.setDate(Math.min(d.getDate(),new Date(x.getFullYear(),x.getMonth()+1,0).getDate()));
+  return x;
+};
+const toIsoDate=d=>{
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+};
+const toIsoMonth=d=>{
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  return `${y}-${m}`;
+};
+const fmtMonthYear=d=>{
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  return `${m}/${d.getFullYear()}`;
+};
+
+function getBulletMonth(item){
+  const yr = Math.max(1, Math.round(num(item.year) || 1));
+  const mo = Math.min(12, Math.max(1, Math.round(num(item.month) || 3)));
+  if(item.freq === 'monthly'){
+    // Month # within the chosen Year # (e.g., month 3 inside year 1 -> month 3; inside year 2 -> month 15)
+    return (yr - 1) * 12 + mo;
+  }
+  // 'annual' -> end of chosen Year # (month 12 of that year)
+  return yr * 12;
+}
+
+function getBulletLabel(item){
+  const yr = Math.max(1, Math.round(num(item.year) || 1));
+  const mo = Math.min(12, Math.max(1, Math.round(num(item.month) || 3)));
+  if(item.freq === 'monthly'){
+    return `بعد ${mo} شهور (سنة ${yr}) | ${mo}M in Yr ${yr}`;
+  }
+  return `دفعة سنوية (سنة ${yr}) | Annual Yr ${yr}`;
+}
+
+function addAnnualRow(year=1, pct=5, freq='monthly', month=3){
+  const id=annIdSeq++;
+  annualPayments.push({id, freq, year, month, mode:'pct', pct, amt:0});
+  renderAnnualRows();
+  calc();
+}
+
+function removeAnnualRow(id){
+  annualPayments=annualPayments.filter(x=>x.id!==id);
+  renderAnnualRows();
+  calc();
+}
+
+function renderAnnualRows(){
+  const container=$('annItems');
+  container.innerHTML=annualPayments.map(item=>{
+    const freq = (item.freq === 'annual') ? 'annual' : 'monthly';
+    const yrVal = Math.max(1, Math.round(num(item.year) || 1));
+    const moVal = Math.min(12, Math.max(1, Math.round(num(item.month) || 3)));
+
+    const monthInput = freq === 'monthly'
+      ? `<label style="min-width:95px"><span class="lbl-txt">بعد كام شهر<small>Month # (1-12)</small></span>
+           <input type="text" inputmode="numeric" class="ann-mo" data-id="${item.id}" value="${moVal}">
+         </label>`
+      : '';
+
+    const yearInput = `<label style="min-width:85px"><span class="lbl-txt">السنة رقم<small>Year #</small></span>
+      <input type="text" inputmode="numeric" class="ann-yr" data-id="${item.id}" value="${yrVal}">
+    </label>`;
+
+    return `
+    <div class="ann-item" data-ann-id="${item.id}" style="grid-template-columns:130px auto 1fr auto">
+      <label><span class="lbl-txt">الاختيار<small>Monthly / Annual</small></span>
+        <select class="ann-freq" data-id="${item.id}" style="width:100%;margin-top:4px;padding:4px 4px;border:1px solid var(--line);border-radius:6px;background:var(--field);color:var(--ink);font:700 11px Cairo,Tahoma,sans-serif;text-align:center">
+          <option value="monthly" ${freq==='monthly'?'selected':''}>شهري | Monthly</option>
+          <option value="annual" ${freq==='annual'?'selected':''}>سنوي | Annual</option>
+        </select>
+      </label>
+      <div style="display:flex;gap:6px;align-items:stretch">${monthInput}${yearInput}</div>
+      <div class="ann-dual">
+        <label><span class="lbl-txt">نسبة الدفعة %<small>Percentage %</small></span>
+          <input type="text" inputmode="decimal" class="ann-pct" data-id="${item.id}" value="${item.pct.toFixed(1)}%">
+        </label>
+        <div class="sw">⇄</div>
+        <label><span class="lbl-txt">قيمة الدفعة (رقم)<small>Amount</small></span>
+          <input type="text" inputmode="decimal" class="ann-amt" data-id="${item.id}" value="${fm(item.amt)}">
+        </label>
+      </div>
+      <button type="button" class="del-btn" onclick="removeAnnualRow(${item.id})" title="حذف الدفعة | Remove">حذف | Del</button>
+    </div>
+  `}).join('');
+
+  container.querySelectorAll('.ann-freq').forEach(sel=>{
+    sel.addEventListener('change',()=>{
+      const item=annualPayments.find(x=>x.id==sel.dataset.id);
+      if(item){
+        item.freq=sel.value;
+        renderAnnualRows();
+        calc();
+      }
+    });
+  });
+
+  container.querySelectorAll('.ann-mo').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+      const item=annualPayments.find(x=>x.id==inp.dataset.id);
+      if(item){item.month=Math.min(12,Math.max(1,Math.round(num(inp.value)||1)));calc();}
+    });
+    inp.addEventListener('focus',()=>inp.select());
+  });
+
+  container.querySelectorAll('.ann-yr').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+      const item=annualPayments.find(x=>x.id==inp.dataset.id);
+      if(item){item.year=Math.max(1,Math.round(num(inp.value)||1));calc();}
+    });
+    inp.addEventListener('focus',()=>inp.select());
+  });
+
+  container.querySelectorAll('.ann-pct').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+      const r=inp.value.replace(/%/g,'');
+      inp.value=r?r+'%':'';
+      inp.setSelectionRange(r.length,r.length);
+      const item=annualPayments.find(x=>x.id==inp.dataset.id);
+      if(item){item.mode='pct';item.pct=num(r);calc();}
+    });
+    inp.addEventListener('focus',()=>inp.select());
+    inp.addEventListener('blur',()=>{
+      const item=annualPayments.find(x=>x.id==inp.dataset.id);
+      if(item){inp.value=item.pct.toFixed(1)+'%';calc();}
+    });
+  });
+
+  container.querySelectorAll('.ann-amt').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+      const item=annualPayments.find(x=>x.id==inp.dataset.id);
+      if(item){item.mode='amt';item.amt=num(inp.value);calc();}
+    });
+    inp.addEventListener('focus',()=>inp.select());
+    inp.addEventListener('blur',()=>{
+      const item=annualPayments.find(x=>x.id==inp.dataset.id);
+      if(item){inp.value=fm(item.amt);calc();}
+    });
+  });
+}
+
+function syncCountsRow(){
+  const y=+G('yrs')||0;
+  if($('cntMonths')) $('cntMonths').textContent=Math.round(y*12);
+  if($('cntQuarters')) $('cntQuarters').textContent=Math.round(y*4);
+  if($('cntYears')) $('cntYears').textContent=y;
+}
+function setInstDisp(mode){
+  syncCountsRow();
+  instDisp=mode;
+  $('dispQ').classList.toggle('active',mode==='quarterly');
+  $('dispM').classList.toggle('active',mode==='monthly');
+  $('dispY').classList.toggle('active',mode==='annual');
+  $('dispAll').classList.toggle('active',mode==='all');
+
+  const showQ=(mode==='quarterly'||mode==='all');
+  const showM=(mode==='monthly'||mode==='all');
+  const showY=(mode==='annual'||mode==='all');
+
+  $('w_qq').classList.remove('hidden'); $('w_qm').classList.remove('hidden'); $('w_qy').classList.remove('hidden');
+  $('w_qq').classList.toggle('num-hidden',!showQ);
+  $('w_qm').classList.toggle('num-hidden',!showM);
+  $('w_qy').classList.toggle('num-hidden',!showY);
+  // مربعات العدد تفضل ظاهرة على طول
+}
+
+function setSchedFreq(freq){
+  schedFreq=freq;
+  $('schedM').classList.toggle('active',freq==='monthly');
+  $('schedQ').classList.toggle('active',freq==='quarterly');
+  $('schedY').classList.toggle('active',freq==='annual');
+  calc();
+}
+
+function setPbBase(base){
+  pbBase=base;
+  $('pbBaseUnit').classList.toggle('active',base==='unit');
+  $('pbBaseGrand').classList.toggle('active',base==='grand');
+  calc();
+}
+
+function setInstType(type){
+  instType=type;
+  const isAnn=(type==='annual');
+  $('btnEqual').classList.toggle('active',!isAnn);
+  $('btnWithAnn').classList.toggle('active',isAnn);
+  $('annContainer').classList.toggle('hidden',!isAnn);
+  $('w_annTotalOut').classList.toggle('hidden',!isAnn);
+  $('g2_dpOuts').style.gridTemplateColumns = isAnn ? 'repeat(3,1fr)' : 'repeat(2,1fr)';
+  if(isAnn && annualPayments.length===0){
+    addAnnualRow(1,5);
+  } else {
+    calc();
+  }
+}
+
+function syncG3Rows(){
+  const r1=$('g3_row1');
+  r1.style.gridTemplateColumns = hasExt ? 'repeat(3,1fr)' : 'repeat(2,1fr)';
+  $('g3_delivRow').classList.toggle('hidden', deliveryMode!=='under_construction');
+  $('g3_stepRow').classList.toggle('hidden', !hasStepRent);
+}
+
+function toggleExt(forceState){
+  hasExt = (typeof forceState === 'boolean') ? forceState : !hasExt;
+  $('btnExt').classList.toggle('on',hasExt);
+  $('btnExt').textContent = hasExt ? '✓ مساحة خارجية مفعّلة | External Area ON' : '+ مساحة خارجية | Add External Area';
+  if($('extMergedWrap')) $('extMergedWrap').classList.toggle('hidden',!hasExt);
+  if($('intBoxTitle')) $('intBoxTitle').textContent = hasExt
+    ? 'المساحة الداخلية + الخارجية (⅓ سعر المتر الداخلي) | Internal + External Area (⅓)'
+    : 'المساحة الداخلية | Internal Area';
+  $('w_rentOut').classList.toggle('hidden',!hasExt);
+  $('pairHint').textContent = hasExt
+    ? 'يمكنك التعديل في سعر المتر الداخلي أو إجمالي الوحدة قبل الخصم وسيتم تحديث الداخلي والخارجي تلقائياً | Edit Internal Price/m² or Total Before Discount to sync.'
+    : 'يمكنك التعديل في سعر المتر الداخلي أو إجمالي الوحدة قبل الخصم وسيتم تحديث الطرف الآخر تلقائياً | Edit Internal Price/m² or Total Before Discount to sync.';
+  syncG3Rows();
+  calc();
+}
+
+function toggleStepRent(forceState){
+  hasStepRent = (typeof forceState === 'boolean') ? forceState : !hasStepRent;
+  $('btnStepRent').classList.toggle('on',hasStepRent);
+  $('btnStepRent').textContent = hasStepRent ? '✓ زيادة متدرجة مفعّلة | Step-up Rent ON' : '+ زيادة متدرجة | Step-up Rent';
+  syncG3Rows();
+  calc();
+}
+
+function setDeliveryMode(mode){
+  deliveryMode=mode;
+  const isReady=(mode==='ready');
+  $('btnReady').classList.toggle('active',isReady);
+  $('btnUnderConst').classList.toggle('active',!isReady);
+  $('readyBanner').classList.toggle('hidden',!isReady);
+  syncG3Rows();
+  updateHintText();
+  calc();
+}
+
+function setPayMode(mode){
+  payMode=mode;
+  const isCash=(mode==='cash');
+  $('btnInst').classList.toggle('active',!isCash);
+  $('btnCash').classList.toggle('active',isCash);
+  $('cashBanner').classList.toggle('hidden',!isCash);
+  ['g2_inputs','w_instType','g2_dpOuts','w_dispBar','g2_instOuts','delivRow'].forEach(id=>{
+    $(id).classList.toggle('hidden',isCash);
+  });
+  $('w_cashAmt').classList.toggle('hidden',!isCash);
+  $('g4').classList.toggle('hidden',isCash);
+  $('schedFreqSwitch').classList.toggle('hidden',isCash);
+  updateHintText();
+  calc();
+}
+
+function updateHintText(){
+  if(payMode==='cash'){
+    $('pmStatus').textContent='الوضع الحالي: كاش بالكامل (يتم حساب العائد ROI على إجمالي سعر الوحدة بعد الخصم) | Current Mode: 100% Cash';
+  } else if(deliveryMode==='ready'){
+    $('pmStatus').textContent='الوضع الحالي: استلام فوري — العائد مطابق للسنة الأولى في الجدول | Ready to Move: ROI synced with Year 1';
+  } else {
+    $('pmStatus').textContent='العائد الاستثماري محسوب تلقائياً عند أول سنة تشغيل واستلام في الجدول | ROI auto-calculated at 1st operational year';
+  }
+}
+
+function calc(){
+  const ain=G('ain');
+  const aout=hasExt ? G('aout') : 0;
+  const f=ain+(aout>0?aout/3:0);
+
+  let ppm=G('ppm'),total;
+  if(src==='total'){total=G('total');ppm=f>0?total/f:0;setv('ppm',ppm)}
+  else{total=ppm*f;setv('total',total)}
+
+  const intTotalVal = ppm * ain;
+  const ppmOutVal = aout>0 ? (ppm/3) : 0;
+  const extTotalVal = ppmOutVal * aout;
+
+  $('intTotal').textContent=fm(intTotalVal);
+  $('ppmOut').textContent=fm(ppmOutVal);
+  $('extTotal').textContent=fm(extTotalVal);
+  $('effArea').textContent=fm(f)+' م² | m²';
+
+  let discPctVal = G('disc');
+  if(typeof discMode !== 'undefined' && discMode==='amt'){ const amtIn = num($('discAmtIn') ? $('discAmtIn').value : '0'); if(total>0){ discPctVal = (amtIn/total)*100; } }
+  const disc=discPctVal/100,da=total*disc,fin=total-da;
+  if($('discAmtIn') && document.activeElement !== $('discAmtIn')) $('discAmtIn').value = fm(da);
+  if(typeof discMode !== 'undefined' && discMode==='amt' && $('disc')){ if(document.activeElement !== $('disc')) $('disc').value = (Math.round(discPctVal*100)/100)+'%'; }
+  const isCash=(payMode==='cash');
+  const isReady=(deliveryMode==='ready');
+
+  const gp_pre = hasGarage ? G('garage') : 0;
+  const dpBaseAmt = hasGarage ? (fin + gp_pre) : fin;
+  let dpPctVal = G('dp');
+  if(!isCash && typeof dpMode !== 'undefined' && dpMode==='amt'){ const amtIn = num($('dpAmtIn') ? $('dpAmtIn').value : '0'); if(dpBaseAmt>0){ dpPctVal = (amtIn/dpBaseAmt)*100; } }
+  const dp=isCash?1:(dpPctVal/100);
+  const dpa=dpBaseAmt*dp;
+  if($('dpAmtIn') && document.activeElement !== $('dpAmtIn')) $('dpAmtIn').value = fm(dpa);
+  if(!isCash && typeof dpMode !== 'undefined' && dpMode==='amt' && $('dp')){ if(document.activeElement !== $('dp')) $('dp').value = (Math.round(dpPctVal*100)/100)+'%'; }
+  const dlDp=isCash?0:(G('delivDp')/100);
+  const dlDpa=dpBaseAmt*dlDp;
+  const y=isCash?0:G('yrs');
+  const Q=y*4;
+
+  // Update Months and Quarters badge under Installment Years
+  if($('cntMonths')) $('cntMonths').textContent=Math.round(y*12); if($('cntYears')) $('cntYears').textContent=y;
+  if($('cntQuarters')) $('cntQuarters').textContent=Math.round(Q);
+
+  // Two-way sync between Contract Date, Years to Delivery, and Project Delivery Month/Year
+  const c0=$('cdate').value?new Date($('cdate').value+'T00:00:00'):new Date();
+  let dl=0;
+  if(isReady){
+    dl=0;
+    if($('ddate')) $('ddate').value=toIsoMonth(c0);
+  } else if(delivSrc==='date' && $('ddate').value){
+    const [yy,mm]=$('ddate').value.split('-').map(Number);
+    const diffMonths=(yy - c0.getFullYear())*12 + ((mm - 1) - c0.getMonth());
+    dl=Math.max(0, Math.round((diffMonths/12)*4)/4);
+    if(document.activeElement!==$('deliv')){
+      $('deliv').value = Number.isInteger(dl) ? fm(dl) : dl.toFixed(2).replace(/\.?0+$/,'');
+    }
+  } else {
+    dl=G('deliv');
+    const calcDv=addMonths(c0,12*dl);
+    if($('ddate') && document.activeElement!==$('ddate')){
+      $('ddate').value=toIsoMonth(calcDv);
+    }
+  }
+
+  let totalAnnAmt=0;
+  if(!isCash && instType==='annual'){
+    annualPayments.forEach(item=>{
+      if(item.mode==='pct'){
+        item.amt = (fin + gp_pre) * (item.pct/100);
+        const amtInp=document.querySelector(`.ann-amt[data-id="${item.id}"]`);
+        if(amtInp && document.activeElement!==amtInp) amtInp.value=fm(item.amt);
+      } else {
+        item.pct = (fin+gp_pre)>0 ? (item.amt/(fin+gp_pre))*100 : 0;
+        const pctInp=document.querySelector(`.ann-pct[data-id="${item.id}"]`);
+        if(pctInp && document.activeElement!==pctInp) pctInp.value=item.pct.toFixed(1)+'%';
+      }
+      totalAnnAmt += item.amt;
+    });
+  }
+
+  const gp = hasGarage ? G('garage') : 0;
+  const totalWithGarage = fin + gp;
+  const baseLbl = $('final') && $('final').parentElement && $('final').parentElement.querySelector('span');
+  if(baseLbl){
+    baseLbl.innerHTML = (hasGarage && gp > 0)
+      ? 'السعر النهائي مع الجراج<small>Final Price incl. Garage</small>'
+      : 'السعر النهائي<small>Final Price</small>';
+  }
+  const hideBaseNow = false;
+  if($('final') && $('final').parentElement){
+    $('final').parentElement.classList.toggle('hidden', hideBaseNow);
+  }
+  if($('btnHideBaseTotal')){
+    $('btnHideBaseTotal').classList.add('hidden');
+  }
+  if($('unhideBaseBar')){
+    $('unhideBaseBar').classList.toggle('hidden', !hideBaseNow);
+  }
+  const rest=isCash?0:Math.max(0,(fin+gp)-dpa-dlDpa-totalAnnAmt);
+  // تسوية آخر قسط: كل قسط يتقرب للجنيه، وآخر قسط يشيل فرق التقريب فالإجمالي يطلع مظبوط بالمللي
+  const grandR=Math.round(fin+gp);
+  const dpaR=Math.round(dpa), dlDpaR=Math.round(dlDpa);
+  const totalAnnR=isCash?0:annualPayments.reduce((a,it)=>a+Math.round(it.amt||0),0);
+  const restR=isCash?0:Math.max(0,grandR-dpaR-dlDpaR-(instType==='annual'?totalAnnR:0));
+  const qyR=y>0?Math.round(restR/y):0, qmR=y>0?Math.round(restR/(y*12)):0, qqR=Q>0?Math.round(restR/Q):0;
+  const qyLast=y>0?restR-qyR*(y-1):0, qmLast=y>0?restR-qmR*(y*12-1):0, qqLast=Q>0?restR-qqR*(Q-1):0;
+  const qy=qyR, qm=qmR, qq=qqR;
+
+  /* discAmt now editable input, synced above */
+  $('final').textContent=fm((hasGarage && gp > 0) ? totalWithGarage : fin);
+  /* dpAmt now editable input, synced above */
+  $('delivDpAmt').textContent=fm(dlDpa);
+  $('annTotalOut').textContent=fm(totalAnnAmt);
+  $('qy').textContent=fm(qy);
+  $('qm').textContent=fm(qm);
+  $('qq').textContent=fm(qq);
+  $('cashAmt').textContent=fm(fin+gp);
+
+  const firstOpYr = isReady ? 1 : (Math.floor(dl) + 1);
+
+  const r=G('rent');
+  const ro=aout>0 ? (r/3) : 0;
+  $('rentOut').textContent=fm(ro);
+
+  const g1=G('grow')/100;
+  const rg=G('resaleGrow')/100, ryrs=Math.max(0,Math.round(G('resaleYears')));
+  const resaleBase=(fin+gp);
+  const resaleEffYrs=(resaleBase==='operation')?ryrs+dl:ryrs;
+  const resaleVal=resaleBase*Math.pow(1+rg,resaleEffYrs);
+  if($('resaleVal')) $('resaleVal').textContent=fm(resaleVal);
+  if($('resaleGain')) $('resaleGain').textContent=(resaleVal-resaleBase>=0?'+':'−')+fm(Math.abs(resaleVal-resaleBase));
+  const sYr=Math.max(1,Math.round(G('stepYr')));
+  const g2=G('stepGrow')/100;
+  const baseYrs = isCash ? 10 : Math.max(10, Math.ceil(y), firstOpYr);
+  const n=Math.min(Math.max(1, baseYrs), 25);
+
+  let h='',first=null,firstOpData=null,firstFullYr=null;
+  let ri=r;
+  for(let i=1;i<=n;i++){
+    if(i>1){
+      const rate=(hasStepRent && i>=sYr) ? g2 : g1;
+      ri=ri*(1+rate);
+    }
+    const riOut = aout>0 ? (ri/3) : 0;
+    const m=ri*ain+riOut*aout,ann=m*12;
+    let pd=fin+gp;
+    if(!isCash){
+      let yrAnn=0;
+      if(instType==='annual'){
+        annualPayments.forEach(item=>{
+          if(getBulletMonth(item) <= i*12) yrAnn += item.amt;
+        });
+      }
+      const yrDl=(isReady || (dl>0 && i>=dl))?dlDpa:0;
+      pd=dpa+Math.min(4*i,Q)*qq+yrAnn+yrDl;
+    }
+    const rented = isReady ? true : (i>dl);
+    if(rented && first===null){
+      first=m*3;
+      firstOpData={yr:i, m, ann, pd};
+    }
+    h+=`<tr${(rented && firstOpData && firstOpData.yr===i)?' style="background:rgba(184,146,74,.12)"':''}>
+      <td>السنة ${i} <small class="dim">Yr ${i}</small></td>
+      <td>${fm(ri)}</td>
+      <td class="dim">${aout>0?fm(riOut):'—'}</td>
+      <td${rented?'':' class="dim"'}>${rented?fm(ann):'—'}</td>
+      <td>${fm(pd)}</td>
+      <td>${(()=>{const pctV=(fin+gp)>0?pd/(fin+gp):0; if(pctV>=0.999 && firstFullYr===null) firstFullYr=i; if(firstFullYr!==null && i>firstFullYr) return '—'; return pc(pctV,0);})()}</td>
+      <td class="${rented?'pos':'dim'}"><b>${rented&&pd>0?roiFmt(ann/pd):'—'}</b></td>
+    </tr>`;
+  }
+  $('rows').innerHTML=h;
+
+  const opM = firstOpData ? firstOpData.m : (r*ain+ro*aout);
+  const opAnn = opM * 12;
+  const paid = isCash ? (fin+gp) : (firstOpData ? firstOpData.pd : dpa);
+  const roi = paid>0 ? opAnn/paid : 0;
+  const capRate = (fin+gp)>0 ? opAnn/(fin+gp) : 0;
+
+  $('rm').textContent=fm(opM);
+  $('rq').textContent=fm(opM*3);
+  $('ry').textContent=fm(opAnn);
+  $('paid').textContent=fm(paid);
+  $('paidPct').textContent=pc((fin+gp)>0?paid/(fin+gp):0,0);
+  $('roi').textContent=roiFmt(roi);
+  if($('capRate')) $('capRate').textContent=roiFmt(capRate);
+  $('roiTop').textContent=roiFmt(roi);
+  $('roiTopSub').textContent = isCash
+    ? 'العائد على المدفوع Cash-on-Cash / ROE (كاش | Cash)'
+    : `العائد على المدفوع Cash-on-Cash / ROE (سنة ${firstOpData?firstOpData.yr:firstOpYr} | Yr ${firstOpData?firstOpData.yr:firstOpYr})`;
+
+  // القسط من الإيجار: كل المعطيات من الجدول (قسط، إيجار، زيادة، إجمالي) — مفيش إدخال جديد
+  let rentDuring=0;
+  let netRowsHtml='';
+  if(!isCash && y>0){
+    let riNet=r;
+    const yInt=Math.max(0,Math.round(y));
+    const annInstNet=yInt>0 ? (((typeof restR!=='undefined') ? restR : rest)/yInt) : 0;
+    let cumRentNet=0;
+    for(let i=1;i<=yInt;i++){
+      if(i>1){ const rateNet=(hasStepRent && i>=sYr) ? g2 : g1; riNet=riNet*(1+rateNet); }
+      const rentedNet=isReady ? true : (i>dl);
+      const riNetOut=aout>0 ? (riNet/3) : 0;
+      const annRentNet=rentedNet ? (riNet*ain + riNetOut*aout)*12 : 0;
+      rentDuring += annRentNet;
+      cumRentNet += annRentNet;
+      const netYear=annInstNet-annRentNet;
+      const oopYear=Math.max(0,netYear), surYear=Math.max(0,-netYear);
+      netRowsHtml+=`<tr><td>السنة ${i} <small class="dim">Yr ${i}</small></td><td>${rentedNet?fm(annRentNet):'—'}</td><td>${fm(annInstNet)}</td><td class="${oopYear>0?'':'dim'}">${oopYear>0?fm(oopYear):'—'}</td><td class="${surYear>0?'pos':'dim'}">${surYear>0?'+'+fm(surYear):'—'}</td><td><b>${fm(cumRentNet)}</b></td></tr>`;
+    }
+  }
+
+  const restForNet=(typeof restR!=='undefined') ? restR : rest;
+  const coveredNet=restForNet>0 ? Math.min(1, rentDuring/restForNet) : 0;
+  const effCostNet=isCash ? fin : (dpaR + dlDpaR + (instType==='annual'?totalAnnR:0) + Math.max(0, restForNet - rentDuring));
+  const netQFirst=isCash ? 0 : (qq - (first||0));
+  if($('netQ')) $('netQ').textContent=(netQFirst>0?'':netQFirst<0?'+':'')+fm(Math.abs(netQFirst))+(netQFirst<0?' فائض':'');
+  if($('rentDuring')) $('rentDuring').textContent=fm(rentDuring);
+  if($('coveredPct')) $('coveredPct').textContent=pc(coveredNet,0);
+  if($('effCost')) $('effCost').textContent=fm(effCostNet);
+  if($('netRows')) $('netRows').innerHTML=netRowsHtml;
+
+  const cq=first||0,diff=cq-qq;
+  $('cq').textContent=fm(cq);
+  $('ci').textContent=fm(qq);
+  $('cd').textContent=(diff<0?'−':'+')+fm(Math.abs(diff));
+  $('cd').className=diff<0?'neg':'pos';
+
+  const fd=d=>d.toLocaleDateString('en-GB');
+  const dv = (delivSrc==='date' && $('ddate').value) ? (()=>{const [yy,mm]=$('ddate').value.split('-').map(Number);return new Date(yy,mm-1,c0.getDate());})() : addMonths(c0,12*dl);
+
+  let s='',sum=0;
+  if(isCash){
+    s=`<tr style="background:rgba(30,107,69,.12)"><td><b>دفعة كاش كاملة | Full Cash Payment (100%)</b></td><td>100%</td><td>${fd(c0)}</td><td><b>${fm(fin+gp)}</b></td></tr>`;
+    sum=fin+gp;
+  } else {
+    s=`<tr><td><b>مقدم التعاقد | Down Payment</b></td><td>${pc(dp,0)}</td><td>${fd(c0)}</td><td>${fm(dpaR)}</td></tr>`;
+    sum=dpaR;
+    let dlAdded=false;
+    if(dlDp>0 && isReady){
+      s+=`<tr style="background:rgba(30,107,69,.12)"><td><b>دفعة استلام فوري | Immediate Delivery Payment</b></td><td>${pc(dlDp,0)}</td><td>${fd(c0)}</td><td><b>${fm(dlDpaR)}</b></td></tr>`;
+      sum+=dlDpaR;
+      dlAdded=true;
+    }
+    const _stepForFreq = schedFreq==='monthly'?1:(schedFreq==='annual'?12:3);
+    const firstOff = (firstInstOffsetMonths!==null && !isNaN(firstInstOffsetMonths)) ? firstInstOffsetMonths : _stepForFreq;
+    const totalM=Math.min(Math.round(y*12),600);
+    const totalQ=Math.min(Math.round(Q),200);
+    const totalY=Math.min(Math.round(y),50);
+
+    const addedBulletIds=new Set();
+    const renderBulletRow=(item, mStep)=>{
+      s+=`<tr style="background:rgba(184,146,74,.14)"><td><b>دفعة إضافية (${getBulletLabel(item)}) | Extra Payment</b></td><td>${item.pct.toFixed(1)}%</td><td>${fd(addMonths(c0,mStep))}</td><td><b>${fm(Math.round(item.amt))}</b></td></tr>`;
+      sum+=Math.round(item.amt);
+      addedBulletIds.add(item.id);
+    };
+
+    if(schedFreq==='monthly'){
+      for(let i=1;i<=totalM;i++){
+        if((i-1)%12===0)s+=`<tr><td colspan="4" class="dim" style="background:var(--pale)">السنة ${(i-1)/12+1} | Year ${(i-1)/12+1}</td></tr>`;
+        const isLastM=(i===totalM), amtM=isLastM?qmLast:qm;
+        s+=`<tr${isLastM&&amtM!==qm?' style="background:rgba(30,107,69,.08)"':''}><td>قسط شهري ${i}${isLastM&&amtM!==qm?' (تسوية)':''} | Monthly Inst. ${i}${isLastM&&amtM!==qm?' (Settlement)':''}</td><td>${pc(fin>0?amtM/fin:0,1)}</td><td>${''+`<input type="date" class="inst-date" data-freq="monthly" data-idx="${i}" value="${toIsoDate(instDateWithCascade(c0,i,1,firstOff,'monthly'))}" onchange="window.__onInstDate(this)" style="border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:12px;width:150px">`}</td><td>${fm(amtM)}</td></tr>`;
+        sum+=amtM;
+
+        if(instType==='annual'){
+          annualPayments.filter(x=>x.amt>0 && !addedBulletIds.has(x.id) && getBulletMonth(x)===i).forEach(item=>{
+            renderBulletRow(item, i);
+          });
+        }
+
+        if(dlDp>0 && !dlAdded && i===Math.round(dl*12)){
+          s+=`<tr style="background:rgba(30,107,69,.12)"><td><b>دفعة استلام | Delivery Payment</b></td><td>${pc(dlDp,0)}</td><td>${fd(dv)}</td><td><b>${fm(dlDpaR)}</b></td></tr>`;
+          sum+=dlDpaR;
+          dlAdded=true;
+        }
+      }
+    } else if(schedFreq==='annual'){
+      for(let i=1;i<=totalY;i++){
+        const isLastY=(i===totalY), amtY=isLastY?qyLast:qy;
+        s+=`<tr${isLastY&&amtY!==qy?' style="background:rgba(30,107,69,.08)"':''}><td>قسط سنوي ${i} (السنة ${i})${isLastY&&amtY!==qy?' (تسوية)':''} | Annual Inst. ${i} (Yr ${i})${isLastY&&amtY!==qy?' (Settlement)':''}</td><td>${pc(fin>0?amtY/fin:0,1)}</td><td>${''+`<input type="date" class="inst-date" data-freq="annual" data-idx="${i}" value="${toIsoDate(instDateWithCascade(c0,i,12,firstOff,'annual'))}" onchange="window.__onInstDate(this)" style="border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:12px;width:150px">`}</td><td>${fm(amtY)}</td></tr>`;
+        sum+=amtY;
+
+        if(instType==='annual'){
+          annualPayments.filter(x=>x.amt>0 && !addedBulletIds.has(x.id) && Math.ceil(getBulletMonth(x)/12)===i).forEach(item=>{
+            renderBulletRow(item, getBulletMonth(item));
+          });
+        }
+
+        if(dlDp>0 && !dlAdded && i===Math.round(dl)){
+          s+=`<tr style="background:rgba(30,107,69,.12)"><td><b>دفعة استلام | Delivery Payment</b></td><td>${pc(dlDp,0)}</td><td>${fd(dv)}</td><td><b>${fm(dlDpaR)}</b></td></tr>`;
+          sum+=dlDpaR;
+          dlAdded=true;
+        }
+      }
+    } else {
+      for(let i=1;i<=totalQ;i++){
+        if((i-1)%4===0)s+=`<tr><td colspan="4" class="dim" style="background:var(--pale)">السنة ${(i-1)/4+1} | Year ${(i-1)/4+1}</td></tr>`;
+        const isLastQ=(i===totalQ), amtQ=isLastQ?qqLast:qq;
+        s+=`<tr${isLastQ&&amtQ!==qq?' style="background:rgba(30,107,69,.08)"':''}><td>قسط ربع سنوي ${i}${isLastQ&&amtQ!==qq?' (تسوية)':''} | Quarterly Inst. ${i}${isLastQ&&amtQ!==qq?' (Settlement)':''}</td><td>${pc(fin>0?amtQ/fin:0,0)}</td><td>${''+`<input type="date" class="inst-date" data-freq="quarterly" data-idx="${i}" value="${toIsoDate(instDateWithCascade(c0,i,3,firstOff,'quarterly'))}" onchange="window.__onInstDate(this)" style="border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:12px;width:150px">`}</td><td>${fm(amtQ)}</td></tr>`;
+        sum+=amtQ;
+
+        if(instType==='annual'){
+          annualPayments.filter(x=>x.amt>0 && !addedBulletIds.has(x.id) && Math.ceil(getBulletMonth(x)/3)===i).forEach(item=>{
+            renderBulletRow(item, getBulletMonth(item));
+          });
+        }
+
+        if(dlDp>0 && !dlAdded && i===Math.round(dl*4)){
+          s+=`<tr style="background:rgba(30,107,69,.12)"><td><b>دفعة استلام | Delivery Payment</b></td><td>${pc(dlDp,0)}</td><td>${fd(dv)}</td><td><b>${fm(dlDpaR)}</b></td></tr>`;
+          sum+=dlDpaR;
+          dlAdded=true;
+        }
+      }
+    }
+    if(instType==='annual'){
+      annualPayments.filter(x=>x.amt>0 && !addedBulletIds.has(x.id)).forEach(item=>{
+        renderBulletRow(item, getBulletMonth(item));
+      });
+    }
+    if(dlDp>0 && !dlAdded){
+      s+=`<tr style="background:rgba(30,107,69,.12)"><td><b>دفعة استلام | Delivery Payment</b></td><td>${pc(dlDp,0)}</td><td>${fd(dv)}</td><td><b>${fm(dlDpaR)}</b></td></tr>`;
+      sum+=dlDpaR;
+    }
+  }
+
+  const mp=G('maint')/100,ma=sum*mp;
+  const delivLabel = isReady ? `استلام فوري | Immediate: ${fmtMonthYear(c0)}` : `استلام | Delivery: ${fmtMonthYear(dv)}`;
+  $('sched').innerHTML=s;
+
+  // Check if DP + Delivery DP + Extra payments exceed 100% of final price
+  const totalPctUsed = isCash ? 100 : ((dp + dlDp) * 100) + (instType === 'annual' ? annualPayments.reduce((acc, it) => acc + (num(it.pct)||0), 0) : 0);
+  if(!isCash && totalPctUsed > 100.05 && $('annContainer') && !$('annContainer').classList.contains('hidden')){
+    $('pmStatus').innerHTML = `<span class="neg">تنبيه: مجموع نسب المقدم والاستلام والدفعات الإضافية (${totalPctUsed.toFixed(1)}%) تجاوز 100% من سعر الوحدة</span>`;
+  } else {
+    updateHintText();
+  }
+  if($('firstInstPrintVal')) $('firstInstPrintVal').textContent = firstInstDateStr ? ('تاريخ أول قسط: '+firstInstDateStr.split('-').reverse().join('/')) : ((firstInstOffsetMonths!==null && firstInstOffsetMonths!=='') ? (firstInstOffsetMonths+' شهر من التعاقد') : 'الافتراضي (حسب الدورية)');
+  $('sfoot').innerHTML=`
+    <tr style="font-weight:700"><td>الإجمالي بدون صيانة | Total Excl. Maintenance</td><td>${pc((fin+gp)>0?sum/(fin+gp):0,0)}</td><td>—</td><td>${fm(sum)}</td></tr>
+    ${mp>0?`<tr><td>وديعة الصيانة | Maintenance Deposit</td><td>${pc(mp,0)}</td><td>—</td><td>${fm(ma)}</td></tr>`:''}
+    <tr style="font-weight:700"><td>السعر الإجمالي النهائي | Grand Total</td><td>—</td><td>${delivLabel}</td><td>${fm(sum+ma)}</td></tr>`;
+
+  // Page 3: Payback Period Calculation
+  const grandTotalVal = (fin + gp) + ((fin + gp) * mp);
+  const targetRecover = (pbBase === 'grand') ? grandTotalVal : (fin+gp);
+  $('pbTargetAmt').textContent = fm(targetRecover);
+
+  let cumRent = 0;
+  let exactOpYears = null;
+  let exactTotalYears = null;
+  let breakYearNum = null;
+  let cumAt12Op = 0;
+  let opYearCounter = 0;
+  let pbHtml = '';
+  let riPb = r;
+  const maxPbYears = 25;
+
+  for(let yr=1; yr<=maxPbYears; yr++){
+    if(yr > 1){
+      const rate = (hasStepRent && yr >= sYr) ? g2 : g1;
+      riPb = riPb * (1 + rate);
+    }
+    const riPbOut = aout > 0 ? (riPb / 3) : 0;
+    const annPb = (riPb * ain + riPbOut * aout) * 12;
+    const isRentedYr = isReady ? true : (yr > dl);
+
+    if(!isRentedYr){
+      pbHtml += `<tr>
+        <td>السنة ${yr} <small class="dim">Yr ${yr}</small></td>
+        <td class="dim">—</td>
+        <td class="dim">0</td>
+        <td class="dim">0%</td>
+        <td>${fm(targetRecover)}</td>
+        <td><span class="pb-badge wait">تحت الإنشاء | Construction</span></td>
+        <td class="dim">—</td>
+      </tr>`;
+      continue;
+    }
+
+    opYearCounter++;
+    const prevCum = cumRent;
+    cumRent += annPb;
+    if(opYearCounter === 12) cumAt12Op = cumRent;
+
+    const rem = Math.max(0, targetRecover - cumRent);
+    const recPct = targetRecover > 0 ? Math.min(1, cumRent / targetRecover) : 1;
+    let isBreakRow = false;
+
+    if(exactOpYears === null && targetRecover > 0 && cumRent >= targetRecover){
+      const neededThisYr = targetRecover - prevCum;
+      const frac = annPb > 0 ? (neededThisYr / annPb) : 0;
+      exactOpYears = (opYearCounter - 1) + frac;
+      exactTotalYears = (yr - 1) + frac;
+      breakYearNum = yr;
+      isBreakRow = true;
+    } else if(targetRecover === 0 && exactOpYears === null){
+      exactOpYears = 0;
+      exactTotalYears = 0;
+      breakYearNum = yr;
+      isBreakRow = true;
+    }
+
+    const badge = (cumRent >= targetRecover && targetRecover > 0)
+      ? (isBreakRow ? `<span class="pb-badge done">✓ تم الاسترداد بالكامل | Recovered</span>` : `<span class="pb-badge done">+ صافي ربح | Net Profit</span>`)
+      : `<span class="pb-badge prog">جاري الاسترداد | In Progress</span>`;
+
+    pbHtml += `<tr${isBreakRow ? ' style="background:rgba(30,107,69,.14);font-weight:700"' : ''}>
+      <td>السنة ${yr} <small class="dim">(تشغيل ${opYearCounter} | Op. ${opYearCounter})</small></td>
+      <td>${fm(annPb)}</td>
+      <td><b>${fm(cumRent)}</b></td>
+      <td>${pc(targetRecover>0 ? cumRent/targetRecover : 0, 0)}</td>
+      <td class="${rem===0?'pos':''}">${rem===0 ? '0' : fm(rem)}</td>
+      <td>${badge}</td>
+      <td class="${(cumRent-targetRecover)>=0?'pos':'dim'}">${(()=>{if(cumRent<targetRecover) return '—'; const np=cumRent-targetRecover; const npp=targetRecover>0?np/targetRecover:0; return '+'+fm(np)+' <small class="dim">('+pc(npp,0)+')</small>';})()}</td>
+    </tr>`;
+
+    if(opYearCounter >= 12 && exactOpYears !== null) break;
+  }
+
+  $('pbRows').innerHTML = pbHtml;
+
+  const fmtYrs = v => {
+    if(v === null) return '> 25 سنة | Yrs';
+    const whole = Math.floor(v);
+    const months = Math.round((v - whole) * 12);
+    if(months === 12) return `${whole + 1} سنة | Yrs`;
+    if(months === 0) return `${whole} سنة | Yrs`;
+    return `${whole} سنة و ${months} شهر`;
+  };
+
+  $('pbOpYears').textContent = fmtYrs(exactOpYears);
+  $('pbTotalYears').textContent = fmtYrs(exactTotalYears);
+  $('pbBreakYear').textContent = breakYearNum ? `السنة ${breakYearNum} | Yr ${breakYearNum}` : '> السنة 25';
+  $('pbCum10').textContent = fm(cumAt12Op || cumRent);
+  const net10 = (cumAt12Op || cumRent) - targetRecover;
+  $('pbNet10').textContent = (net10 >= 0 ? '+' : '−') + fm(Math.abs(net10));
+  $('pbNet10').className = net10 >= 0 ? 'pos' : 'neg';
+}
+
+function loadDefaults(){
+  Object.keys(D).forEach(k=>$(k).value=fm(D[k]));
+  ['disc','dp','delivDp','grow','stepGrow','maint','resaleGrow'].forEach(k=>$(k).value=fm(D[k])+'%');
+  $('proj').value='';
+  $('client').value='';
+  $('unit').value='';
+  if($('unitType')) $('unitType').value='';
+  const today=new Date();
+  $('cdate').value=toIsoDate(today);
+  $('ddate').value=toIsoMonth(addMonths(today,12*D.deliv));
+  annualPayments=[];
+  src='ppm';
+  delivSrc='yrs';
+  toggleExt(true);
+  toggleGarage(false);
+  toggleStepRent(false);
+  setInstType('equal');
+  setInstDisp('quarterly');
+  setSchedFreq('quarterly');
+  setDeliveryMode('under_construction');
+  setPayMode('installment');
+}
+
+function clearAll(){
+  Object.keys(D).forEach(k=>{
+    const el=$(k);
+    el.value=el.dataset.pct?'0%':'0';
+  });
+  $('total').value='0';
+  $('proj').value='';
+  $('client').value='';
+  $('unit').value='';
+  if($('unitType')) $('unitType').value='';
+  const today=new Date();
+  $('cdate').value=toIsoDate(today);
+  $('ddate').value=toIsoMonth(today);
+  annualPayments=[];
+  src='ppm';
+  delivSrc='yrs';
+  toggleExt(false);
+  toggleGarage(false);
+  toggleStepRent(false);
+  setInstType('equal');
+  setInstDisp('quarterly');
+  setSchedFreq('quarterly');
+  setDeliveryMode('under_construction');
+  setPayMode('installment');
+  $('ain').focus();
+}
+
+
+// Live thousand separators while typing (prices/numbers) - الحساب بيتجاهل الفواصل أصلاً
+function formatLiveInput(el){
+  if(!el || el.tagName!=='INPUT') return;
+  if(el.dataset.pct || el.dataset.txt) return;
+  if(['date','month','number'].includes(el.type)) return;
+  const raw = el.value;
+  if(!raw) return;
+  const caret = el.selectionStart ?? raw.length;
+  const beforeCaret = raw.slice(0, caret);
+  const digitsBefore = beforeCaret.replace(/[^0-9٠-٩.٫]/g,'').length;
+  let cleaned = String(raw).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٫]/g,'.').replace(/[^0-9.-]/g,'');
+  if(!cleaned || cleaned==='-' || cleaned==='.' || cleaned==='-.') return;
+  const neg = cleaned.startsWith('-');
+  if(neg) cleaned = cleaned.slice(1);
+  const parts = cleaned.split('.');
+  let intPart = parts[0].replace(/^0+(?=\d)/,'') || '0';
+  intPart = Number(intPart).toLocaleString('en-US');
+  let formatted = (neg?'-':'') + intPart + (parts.length>1 ? '.' + parts.slice(1).join('') : '');
+  if(formatted === raw) return;
+  el.value = formatted;
+  // Restore cursor after the same number of digits
+  let seen=0, pos=formatted.length;
+  for(let i=0;i<formatted.length;i++){
+    if(/[0-9.]/.test(formatted[i])) seen++;
+    if(seen>=digitsBefore){ pos=i+1; break; }
+  }
+  try{ el.setSelectionRange(pos,pos); }catch(e){}
+}
+document.addEventListener('input', (e)=>{
+  const el = e.target;
+  if(el && el.tagName==='INPUT') formatLiveInput(el);
+});
+
+document.querySelectorAll('input').forEach(el=>{
+  el.addEventListener('input',()=>{
+    if(el.dataset.pct){
+      const r=el.value.replace(/%/g,'');
+      el.value=r?r+'%':'';
+      el.setSelectionRange(r.length,r.length);
+    }
+    if(el.id==='ppm')src='ppm';
+    if(el.id==='total')src='total';
+    if(el.id==='deliv')delivSrc='yrs';
+    if(el.id==='ddate')delivSrc='date';
+    calc();
+  });
+  el.addEventListener('focus',()=>el.select());
+  el.addEventListener('blur',()=>{
+    if(el.dataset.txt)return;
+    if(el.id==='deliv' || el.id==='yrs'){
+      const v=num(el.value);
+      el.value=Number.isInteger(v)?fm(v):v.toFixed(2).replace(/\.?0+$/,'');
+    } else {
+      el.value=fm(num(el.value))+(el.dataset.pct?'%':'');
+    }
+    calc();
+  });
+});
+
+$('themeBtn').addEventListener('click',()=>{
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+});
+
+$('btnExt').addEventListener('click',()=>toggleExt());
+$('btnStepRent').addEventListener('click',()=>toggleStepRent());
+$('btnReady').addEventListener('click',()=>setDeliveryMode('ready'));
+$('btnUnderConst').addEventListener('click',()=>setDeliveryMode('under_construction'));
+$('btnInst').addEventListener('click',()=>setPayMode('installment'));
+$('btnCash').addEventListener('click',()=>setPayMode('cash'));
+$('btnEqual').addEventListener('click',()=>setInstType('equal'));
+$('btnWithAnn').addEventListener('click',()=>setInstType('annual'));
+$('dispQ').addEventListener('click',()=>setInstDisp('quarterly')); if($('dp')) $('dp').addEventListener('input',()=>{dpMode='pct';}); if($('dpAmtIn')) $('dpAmtIn').addEventListener('input',()=>{dpMode='amt'; const amt=num($('dpAmtIn').value); const base=num($('final')?$('final').textContent:'0') + (typeof hasGarage!=='undefined' && hasGarage ? num($('garage')?$('garage').value:'0') : 0); if(base>0){ const p=(amt/base)*100; if($('dp')) $('dp').value=(Math.round(p*100)/100)+'%'; } calc();}); if($('disc')) $('disc').addEventListener('input',()=>{discMode='pct';}); if($('discAmtIn')) $('discAmtIn').addEventListener('input',()=>{discMode='amt'; const amt=num($('discAmtIn').value); const tot=num($('total')?$('total').value:'0'); if(tot>0){ const p=(amt/tot)*100; if($('disc')) $('disc').value=(Math.round(p*100)/100)+'%'; } calc();});
+$('dispM').addEventListener('click',()=>setInstDisp('monthly'));
+$('dispY').addEventListener('click',()=>setInstDisp('annual'));
+$('dispAll').addEventListener('click',()=>setInstDisp('all'));
+$('schedM').addEventListener('click',()=>setSchedFreq('monthly'));
+$('schedQ').addEventListener('click',()=>setSchedFreq('quarterly'));
+$('schedY').addEventListener('click',()=>setSchedFreq('annual'));
+$('addAnnBtn').addEventListener('click',()=>addAnnualRow(annualPayments.length+1,5));
+function setActivePage(p){
+  $('page1').classList.toggle('hidden',p!==1);
+  $('page2').classList.toggle('hidden',p!==2);
+  $('page3').classList.toggle('hidden',p!==3);
+  $('tabPage1').classList.toggle('active',p===1);
+  $('tabPage2').classList.toggle('active',p===2);
+  $('tabPage3').classList.toggle('active',p===3);
+  $('tabPage1').setAttribute('aria-selected',p===1?'true':'false');
+  $('tabPage2').setAttribute('aria-selected',p===2?'true':'false');
+  $('tabPage3').setAttribute('aria-selected',p===3?'true':'false');
+}
+
+$('tabPage1').addEventListener('click',()=>setActivePage(1));
+$('tabPage2').addEventListener('click',()=>setActivePage(2));
+$('tabPage3').addEventListener('click',()=>setActivePage(3));
+$('pbBaseUnit').addEventListener('click',()=>setPbBase('unit'));
+$('pbBaseGrand').addEventListener('click',()=>setPbBase('grand'));
+function triggerSmartPrint(){
+  const onSubPage = ($('page2') && !$('page2').classList.contains('hidden')) || ($('page3') && !$('page3').classList.contains('hidden'));
+  document.body.classList.toggle('printing-subpage', !!onSubPage);
+  window.print();
+  setTimeout(()=>document.body.classList.remove('printing-subpage'), 500);
+}
+window.addEventListener('afterprint', ()=>document.body.classList.remove('printing-subpage'));
+$('printBtn').addEventListener('click',triggerSmartPrint);
+$('clearBtn').addEventListener('click',()=>{
+  const ok = window.confirm('هل أنت متأكد أنك تريد تصفير كل البيانات والبدء بوحدة جديدة؟\nلا يمكن التراجع عن هذا الإجراء.\n\nAre you sure you want to reset all data and start a new unit? This cannot be undone.');
+  if(ok) clearAll();
+});
+
+
+function buildWhatsAppText(){
+  const proj = ($('proj') && $('proj').value.trim()) ? $('proj').value.trim() : 'عرض وحدة عقارية';
+  const unit = ($('unit') && $('unit').value.trim()) ? ` | وحدة: ${$('unit').value.trim()}` : '';
+  const isCash = (payMode === 'cash');
+  const ainVal = G('ain');
+  const aoutVal = hasExt ? G('aout') : 0;
+  let areaLine = `• المساحة الداخلية: *${fm(ainVal)} م²*`;
+  if(hasExt && aoutVal > 0){
+    areaLine += ` | الخارجية: *${fm(aoutVal)} م²*`;
+  }
+
+  const totalBeforeDisc = num($('total') ? $('total').value : '0');
+  const discPctNum = G('disc');
+  const finTxt = $('final') ? $('final').textContent : '0';
+  const gpWa = hasGarage ? G('garage') : 0;
+  const finPlusGarageTxt = finTxt;
+  const baseTitleWa = (hasGarage && gpWa > 0) ? 'السعر النهائي مع الجراج' : 'السعر النهائي';
+  const garageTitleWa = 'سعر الجراج';
+  const hideBaseWa = false;
+
+  const dpTxt = $('dpAmtIn') ? $('dpAmtIn').value : '0';
+  const dpPctTxt = $('dp') ? $('dp').value : '0%';
+  const yrsTxt = $('yrs') ? $('yrs').value : '0';
+  const qqTxt = $('qq') ? $('qq').textContent : '0';
+  const qmTxt = $('qm') ? $('qm').textContent : '0';
+  const qyTxt = $('qy') ? $('qy').textContent : '0';
+  const extraTxt = $('annTotalOut') ? $('annTotalOut').textContent : '0';
+  const roiTxt = $('roi') ? $('roi').textContent : '0.0%';
+
+  const unitTypeVal = ($('unitType') && $('unitType').value.trim()) ? $('unitType').value.trim() : '';
+  let lines = [
+    `*${proj}${unit}*`,
+    areaLine
+  ];
+  if(unitTypeVal){
+    lines.push(`• نوع الوحدة | Unit Type: *${unitTypeVal}*`);
+  }
+
+  if(discPctNum > 0){
+    lines.push(`• إجمالي السعر قبل الخصم (${discPctNum}%): *${fm(totalBeforeDisc)}*`);
+  }
+  if(hasGarage && gpWa > 0){
+    lines.push(`• ${garageTitleWa}: *${fm(gpWa)}*`);
+  }
+  lines.push(`• ${baseTitleWa}: *${finTxt}*`);
+
+  const delivStatusTxt = (deliveryMode === 'ready') ? 'استلام فوري' : `تحت الإنشاء (استلام خلال ${$('deliv') ? $('deliv').value : '0'} سنة)`;
+  lines.push(`• حالة الاستلام: *${delivStatusTxt}*`);
+  if(isCash){
+    lines.push(`• نظام السداد: *كاش 100%*`);
+  } else {
+    lines.push(`• المقدم (${dpPctTxt}): *${dpTxt}*`);
+    const dlDpPctTxt = $('delivDp') ? $('delivDp').value : '0%';
+    if(num(dlDpPctTxt) > 0){
+      lines.push(`• دفعة الاستلام (${dlDpPctTxt}): *${$('delivDpAmt') ? $('delivDpAmt').textContent : '0'}*`);
+    }
+    lines.push(`• مدة التقسيط: *${yrsTxt} سنوات*`);
+    let instParts = [];
+    if(instDisp === 'quarterly' || instDisp === 'all') instParts.push(`ربع سنوي *${qqTxt}*`);
+    if(instDisp === 'monthly' || instDisp === 'all') instParts.push(`شهري *${qmTxt}*`);
+    if(instDisp === 'annual' || instDisp === 'all') instParts.push(`سنوي *${qyTxt}*`);
+    if(instParts.length > 0){
+      lines.push(`• القسط: ${instParts.join(' | ')}`);
+    }
+    if(instType === 'annual' && num(extraTxt) > 0){
+      lines.push(`• إجمالي الدفعات الإضافية: *${extraTxt}*`);
+    }
+  }
+  lines.push(`• العائد الاستثماري المتوقع (ROI): *${roiTxt}*`);
+  return lines.join('\n');
+}
+
+if($('waBtn')){
+  $('waBtn').addEventListener('click', async ()=>{
+    const txt = buildWhatsAppText();
+    try{
+      await navigator.clipboard.writeText(txt);
+    }catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    if($('copyToast')){
+      $('copyToast').textContent = '✓ تم نسخ ملخص العرض للواتساب';
+      setTimeout(()=>{ if($('copyToast')) $('copyToast').textContent = ''; }, 2500);
+    }
+  });
+}
+
+
+// Lock/Unlock inputs toggle for client/broker presentations
+let isSheetLocked = false;
+function setSheetLock(state){
+  isSheetLocked = state;
+  document.body.classList.toggle('sheet-locked', isSheetLocked);
+  const btn = $('lockBtn');
+  if(btn){
+    btn.classList.toggle('locked', isSheetLocked);
+    btn.innerHTML = isSheetLocked ? '🔒 مقفول | Locked' : '🔓 مفتوح | Unlocked';
+  }
+  document.querySelectorAll('input, select').forEach(el => {
+    el.disabled = isSheetLocked;
+  });
+}
+
+if($('lockBtn')){
+  $('lockBtn').addEventListener('click', ()=>{
+    setSheetLock(!isSheetLocked);
+  });
+}
+
+function toggleGarage(forceState){
+  hasGarage = (typeof forceState === 'boolean') ? forceState : !hasGarage;
+  if(!hasGarage) hideBaseTotal = false;
+  if($('btnGarage')){
+    $('btnGarage').classList.toggle('on', hasGarage);
+    $('btnGarage').textContent = hasGarage ? '✓ جراج مفعّل | Garage ON' : '+ جراج | Garage';
+  }
+  if($('garageBox')){
+    $('garageBox').classList.toggle('hidden', !hasGarage);
+  }
+  calc();
+}
+
+function toggleDelivDp(forceState){
+  hasDelivDp = (typeof forceState === 'boolean') ? forceState : !hasDelivDp;
+  if(!hasDelivDp && $('delivDp')) $('delivDp').value='0%';
+  if($('btnDelivDp')){
+    $('btnDelivDp').classList.toggle('on', hasDelivDp);
+    $('btnDelivDp').textContent = hasDelivDp ? '✓ دفعة استلام مفعّلة | Delivery Payment ON' : '+ دفعة استلام | Delivery Payment';
+  }
+  if($('delivBox')) $('delivBox').classList.toggle('hidden', !hasDelivDp);
+  calc();
+}
+if($('btnDelivDp')) $('btnDelivDp').addEventListener('click', ()=>toggleDelivDp());
+function setHideBaseTotal(val){
+  hideBaseTotal = !!val;
+  calc();
+}
+
+if($('btnGarage')) $('btnGarage').addEventListener('click', ()=>toggleGarage());
+if($('btnHideBaseTotal')) $('btnHideBaseTotal').addEventListener('click', ()=>setHideBaseTotal(true));
+if($('btnShowBaseTotal')) $('btnShowBaseTotal').addEventListener('click', ()=>setHideBaseTotal(false));
+
+loadDefaults();
+if($('delivDp') && G('delivDp')>0){ toggleDelivDp(true); } else { toggleDelivDp(false); }
+setActivePage(1);
+syncActiveCheckmarks();
+
+function syncActiveCheckmarks(){
+  document.querySelectorAll('.mode-btn').forEach(btn=>{
+    if(!btn.dataset.rawLabel){
+      btn.dataset.rawLabel = btn.textContent.replace(/^✓\s*/, '').trim();
+    }
+    const isAct = btn.classList.contains('active');
+    btn.textContent = isAct ? ('✓ ' + btn.dataset.rawLabel) : btn.dataset.rawLabel;
+  });
+}
+const _origSetActivePage = setActivePage;
+setActivePage = function(p){ _origSetActivePage(p); syncActiveCheckmarks(); };
+const _origSetDeliveryMode = setDeliveryMode;
+setDeliveryMode = function(m){ _origSetDeliveryMode(m); syncActiveCheckmarks(); };
+const _origSetPayMode = setPayMode;
+setPayMode = function(m){ _origSetPayMode(m); syncActiveCheckmarks(); };
+const _origSetInstType = setInstType;
+setInstType = function(t){ _origSetInstType(t); syncActiveCheckmarks(); };
+const _origSetInstDisp = setInstDisp;
+setInstDisp = function(d){ _origSetInstDisp(d); syncActiveCheckmarks(); };
+const _origSetSchedFreq = setSchedFreq;
+setSchedFreq = function(f){ _origSetSchedFreq(f); syncActiveCheckmarks(); };
+if(typeof setPbBase === 'function'){
+  const _origSetPbBase = setPbBase;
+  setPbBase = function(b){ _origSetPbBase(b); syncActiveCheckmarks(); };
+}
+syncActiveCheckmarks();
+
+</script>
+</body>
+</html>
